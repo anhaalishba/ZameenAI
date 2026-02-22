@@ -247,15 +247,13 @@ elif menu == "💬 Chatbot":
         st.session_state.messages.append({"role": "assistant", "content": reply})
         st.chat_message("assistant").write(reply)
 
-# =============================
-# DISEASE DETECTION (STABLE VERSION)
-# =============================
+
 # =============================
 # DISEASE DETECTION (BYPASS 403)
 # =============================
 elif menu == "🦠 Disease Detection":
     st.subheader("🦠 Crop Disease Detection")
-    st.write("Fasal ki tasveer khainchein ya upload karein.")
+    st.write("Take a picture of crop or upload")
 
     # Form use karne se Axios error bypass ho jata hai
     with st.form("disease_form", clear_on_submit=True):
@@ -263,9 +261,9 @@ elif menu == "🦠 Disease Detection":
         cam_image = st.camera_input("Take a photo of the leaf")
         
         # Option 2: File Upload (If camera not available)
-        file_image = st.file_uploader("Ya file select karein", type=["jpg", "jpeg", "png"])
+        file_image = st.file_uploader("Select File", type=["jpg", "jpeg", "png"])
         
-        submit_button = st.form_submit_button("Bimari Check Karein")
+        submit_button = st.form_submit_button("Check Disease")
 
     # Image processing logic
     target_image = cam_image if cam_image is not None else file_image
@@ -278,9 +276,9 @@ elif menu == "🦠 Disease Detection":
             # AI ke liye 1024px kafi hai, is se Axios crash nahi hota
             img.thumbnail((1024, 1024))
             
-            st.image(img, caption="Processing Image...", width=300)
+            # st.image(img, caption="Processing Image...", width=300)
 
-            with st.spinner("Gemini 2.0 tajziya kar raha hai..."):
+            with st.spinner("Checking..."):
                 # prompt
                 prompt = """
                     You are an expert plant pathologist for Pakistan's crops. 
@@ -288,6 +286,7 @@ elif menu == "🦠 Disease Detection":
                     1. Name the disease.
                     2. Give a brief explanation of why it happened.
                     3. Suggest organic (desi) and chemical remedies.
+                    4.Answer briefly in 400 words max.
                     If the plant is healthy, congratulate the farmer.
                     """
                 
