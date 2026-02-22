@@ -32,6 +32,7 @@ client = OpenAI(
 SYSTEM_PROMPT = """
 You are ZameenAI, an expert agricultural assistant for Pakistan.
 You ONLY answer questions related to:
+-This app ZameenAI Ultra
 - Farming
 - Crops
 - Soil
@@ -164,28 +165,50 @@ elif menu == "🧪 Fertilizer AI":
 # =============================
 # CROP CALENDAR
 # =============================
+# =============================
+# CROP CALENDAR (WITH DROPDOWN)
+# =============================
 elif menu == "📅 Crop Calendar":
-
     st.subheader("📅 Pakistan Crop Calendar")
-    month = datetime.datetime.now().strftime("%B")
+    st.write("Select a month to see the recommended agricultural activities.")
 
-    calendar = {
-        "January": "Wheat irrigation",
-        "February": "Potato harvesting",
-        "March": "Cotton prep",
-        "April": "Rice nursery",
-        "May": "Sugarcane care",
-        "June": "Rice transplant",
-        "July": "Maize sowing",
-        "August": "Cotton pest control",
-        "September": "Rice harvest",
-        "October": "Wheat prep",
-        "November": "Wheat sowing",
-        "December": "Vegetables"
+    # List of months for the dropdown
+    months_list = [
+        "January", "February", "March", "April", "May", "June", 
+        "July", "August", "September", "October", "November", "December"
+    ]
+    
+    # Get current month to set as default index
+    current_month_str = datetime.datetime.now().strftime("%B")
+    default_index = months_list.index(current_month_str)
+    
+    # Expanded Calendar Data
+    calendar_data = {
+        "January": "🌾 **Wheat:** Apply second irrigation and urea. Prepare land for spring vegetables like gourds.",
+        "February": "🥔 **Potato:** Harvesting begins. **Sugarcane:** Ideal time for spring planting.",
+        "March": "☁️ **Cotton:** Start land preparation. **Sunflower:** Sowing should be completed this month.",
+        "April": "🌾 **Rice:** Prepare nurseries for Basmati. **Wheat:** Harvesting starts in Sindh and Southern Punjab.",
+        "May": "🎋 **Sugarcane:** Focus on irrigation and hoeing. **Cotton:** Peak sowing time in Punjab.",
+        "June": "🌱 **Rice:** Transplantation to main fields. **Maize:** Sowing for the autumn crop begins.",
+        "July": "🌽 **Monsoon Crops:** Maintenance of Maize and Sugarcane. Ensure proper drainage for rain.",
+        "August": "🐛 **Cotton:** Critical month for pest scouting (Whitefly/Bollworms). **Pulses:** Sowing of Mung and Mash beans.",
+        "September": "🌾 **Rice:** Early varieties (like KS-282) are ready for harvest. **Mustard:** Start sowing Toria.",
+        "October": "🚜 **Wheat Prep:** Land preparation is key. **Oilseeds:** Best time for sowing Mustard and Canola.",
+        "November": "🌾 **Wheat:** Peak sowing time for maximum yield. **Sugarcane:** Harvesting and crushing season begins.",
+        "December": "🥦 **Vegetables:** Care for winter crops (Cabbage, Radish). **Wheat:** Apply first irrigation (Kor) 20-25 days after sowing."
     }
 
-    st.success(f"{month}: {calendar.get(month)}")
+    # Month Selection Dropdown
+    selected_month = st.selectbox("Select Month:", months_list, index=default_index)
 
+    # Displaying the Result
+    st.markdown(f"---")
+    st.markdown(f"### 🗓️ Agricultural Activities for **{selected_month}**")
+    st.success(calendar_data.get(selected_month))
+    
+    # Highlight if it's the current month
+    if selected_month == current_month_str:
+        st.info(f"✨ **Note:** This is the current month. Prioritize these tasks for your farm.")
 # =============================
 # SMART ADVISORY (AI)
 # =============================
