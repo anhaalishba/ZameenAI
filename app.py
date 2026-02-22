@@ -64,10 +64,9 @@ st.caption("AI Powered Smart Farming Decision System")
 # =============================
 # MENU
 # =============================
-# Label fix: Empty string ki jagah 'Select Option' diya hai aur hide kiya hai
 menu = st.radio(
     "Navigation Menu", 
-    ["🌦 Weather", "🌾 Crop Estimator", "📈 Market & Profit", "🧪 Fertilizer AI", "📅 Crop Calendar", "🤖 Smart Advisory", "💬 Chatbot", "🦠 Disease Detection"],
+    ["🌦 Weather", "🦠 Disease Detection", "💬 Chatbot","🤖 Smart Advisory","🌾 Crop Estimator", "🧪 Fertilizer AI",  "📈 Market & Profit", "📅 Crop Calendar"],
     horizontal=True,
     label_visibility="collapsed"
 )
@@ -309,7 +308,7 @@ elif menu == "🦠 Disease Detection":
                     1. Name the disease.
                     2. Give a brief explanation of why it happened.
                     3. Suggest organic (desi) and chemical remedies.
-                    4.Answer briefly in 400 words max.
+                    4.Answer briefly in 200 words max.
                     If the plant is healthy, congratulate the farmer.
                     """
                 
