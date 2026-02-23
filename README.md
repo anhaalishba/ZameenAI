@@ -1,7 +1,7 @@
 ```markdown
 # 🌾 ZameenAI Ultra: AI-Powered Smart Farming System
 
-**ZameenAI Ultra** is a comprehensive precision agriculture ecosystem designed to empower farmers in Pakistan. By leveraging state-of-the-art Artificial Intelligence, it provides real-time solutions for disease detection, crop management, and market predictability.
+ZameenAI Ultra is a comprehensive precision agriculture ecosystem designed to empower farmers in Pakistan. By leveraging state-of-the-art Artificial Intelligence, it provides real-time solutions for disease detection, crop management, and market predictability.
 
 ---
 
@@ -29,7 +29,7 @@
 
 1. **Clone the repository:**
    ```bash
-   git clone [https://github.com/anhaalishba/ZameenAI.git](https://github.com/anhaalishba/ZameenAI.git)
+   git clone [https://github.com/anhaalishba/ZameenAI.git]
    cd zameenai-ultra
 
 ```
