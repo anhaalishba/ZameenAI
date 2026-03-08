@@ -17,6 +17,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
+API_KEY = st.secrets["OPENWEATHER_API_KEY"]
 gemini_client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
 # =============================
 # GROQ CLIENT (ONLY 1 API)
@@ -74,28 +75,31 @@ menu = st.radio(
 # =============================
 # WEATHER
 # =============================
+
 if menu == "🌦 Weather":
 
     st.subheader("🌦 Live Weather")
     city = st.text_input("Enter City Name")
 
-    def get_coordinates(city):
-        geo_url = f"https://geocoding-api.open-meteo.com/v1/search?name={city}"
-        geo_data = requests.get(geo_url).json()
-        if "results" in geo_data:
-            return geo_data["results"][0]["latitude"], geo_data["results"][0]["longitude"]
-        return None, None
-
     if st.button("Get Weather"):
-        lat, lon = get_coordinates(city)
-        if lat:
-            weather_url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current_weather=true"
-            data = requests.get(weather_url).json()
-            temp = data["current_weather"]["temperature"]
-            wind = data["current_weather"]["windspeed"]
+
+        url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={API_KEY}&units=metric"
+
+        response = requests.get(url)
+        data = response.json()
+
+        if data["cod"] == 200:
+
+            temp = data["main"]["temp"]
+            wind = data["wind"]["speed"]
+            humidity = data["main"]["humidity"]
+            description = data["weather"][0]["description"]
 
             st.success(f"🌡 Temperature: {temp}°C")
-            st.info(f"💨 Wind Speed: {wind} km/h")
+            st.info(f"💨 Wind Speed: {wind} m/s")
+            st.write(f"💧 Humidity: {humidity}%")
+            st.write(f"🌥 Condition: {description}")
+
         else:
             st.error("City not found")
 
