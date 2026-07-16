@@ -277,7 +277,7 @@ elif menu == "💬 Chatbot":
 
     # Voice Input
     voice_input = speech_to_text(
-        language="ur-PK",   # Change to "ur-PK" if your browser supports Urdu
+        language="ur-PK",   # or "en-US"
         use_container_width=True,
         just_once=True,
         key="voice"
@@ -297,28 +297,22 @@ elif menu == "💬 Chatbot":
 
         st.chat_message("user").write(user_input)
 
-        if not is_farming_question(user_input):
+        response = client.responses.create(
+            model="openai/gpt-oss-20b",
+            input=[
+                {
+                    "role": "system",
+                    "content": SYSTEM_PROMPT
+                },
+                {
+                    "role": "user",
+                    "content": user_input
+                }
+            ],
+            max_output_tokens=1000
+        )
 
-            reply = "🌾 I can only help with farming and agriculture-related questions."
-
-        else:
-
-            response = client.responses.create(
-                model="openai/gpt-oss-20b",
-                input=[
-                    {
-                        "role": "system",
-                        "content": SYSTEM_PROMPT
-                    },
-                    {
-                        "role": "user",
-                        "content": user_input
-                    }
-                ],
-                max_output_tokens=1000
-            )
-
-            reply = response.output_text
+        reply = response.output_text
 
         st.session_state.messages.append(
             {"role": "assistant", "content": reply}
