@@ -70,8 +70,11 @@ html, body, [class*="css"]  {
 }
 
 .stApp {
-    background: radial-gradient(circle at top left, #1c2028 0%, #0f1115 55%, #0a0b0e 100%);
-    color: #e6e8eb;
+    background:
+        radial-gradient(circle at 15% 0%, rgba(37,99,235,0.18) 0%, transparent 45%),
+        radial-gradient(circle at 85% 20%, rgba(59,130,246,0.10) 0%, transparent 40%),
+        linear-gradient(180deg, #0b0d12 0%, #10131a 45%, #14181f 100%);
+    color: #e7eaf0;
 }
 
 /* Hide default streamlit chrome a bit */
@@ -79,52 +82,97 @@ html, body, [class*="css"]  {
 
 /* Make default streamlit text light on dark bg */
 p, span, label, .stMarkdown, h1, h2, h3, h4, h5 {
-    color: #e6e8eb;
+    color: #e7eaf0;
 }
 
 /* Hero header */
 .hero {
-    background: linear-gradient(135deg, #1e2128 0%, #262b35 60%, #2f3542 100%);
+    background: linear-gradient(135deg, #131722 0%, #171c28 55%, #1b2233 100%);
     padding: 34px 40px;
     border-radius: 20px;
     margin-bottom: 22px;
-    border: 1px solid #333844;
-    box-shadow: 0 12px 30px rgba(0,0,0,0.45);
+    border: 1px solid #262e3d;
+    box-shadow: 0 14px 34px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.03);
 }
 .hero h1 {
     color: #ffffff;
     font-size: 34px;
     font-weight: 700;
     margin: 0;
-    background: linear-gradient(90deg, #7ee68b, #4fd1c5);
+    background: linear-gradient(90deg, #5eb1ff, #7c8cff);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 .hero p {
-    color: #b6bcc6;
+    color: #93a0b5;
     font-size: 15px;
     margin-top: 6px;
     margin-bottom: 0;
 }
 
+/* ===================================== */
+/* MODERN SEGMENTED NAV                  */
+/* ===================================== */
+div[data-testid="stRadio"] {
+    background: linear-gradient(180deg, #12151d 0%, #0f1218 100%);
+    border: 1px solid #232a38;
+    border-radius: 16px;
+    padding: 10px;
+    box-shadow: inset 0 1px 4px rgba(0,0,0,0.4);
+    margin-bottom: 8px;
+}
+div[role="radiogroup"] {
+    gap: 8px;
+    flex-wrap: wrap;
+}
+/* hide the native radio dot, keep only the pill */
+div[role="radiogroup"] label > div:first-child {
+    display: none !important;
+}
+div[role="radiogroup"] label {
+    background: transparent;
+    border: 1px solid #262e3d;
+    padding: 10px 20px;
+    border-radius: 12px;
+    transition: all 0.18s ease-in-out;
+    color: #9aa5b6 !important;
+    font-weight: 500;
+    cursor: pointer;
+}
+div[role="radiogroup"] label:hover {
+    border-color: #3b82f6;
+    color: #cfe0ff !important;
+    background: rgba(59,130,246,0.08);
+}
+div[role="radiogroup"] label:has(input:checked) {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    border-color: #3b82f6;
+    color: #ffffff !important;
+    box-shadow: 0 6px 18px rgba(37,99,235,0.45);
+}
+div[role="radiogroup"] label:has(input:checked) p {
+    color: #ffffff !important;
+    font-weight: 600;
+}
+
 /* Section card wrapper */
 .section-card {
-    background: linear-gradient(180deg, #1a1d24 0%, #16181d 100%);
+    background: linear-gradient(180deg, #161a22 0%, #12151c 100%);
     border-radius: 18px;
     padding: 26px 28px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-    border: 1px solid #2a2e37;
+    box-shadow: 0 8px 26px rgba(0,0,0,0.45);
+    border: 1px solid #232a38;
     margin-bottom: 20px;
 }
 
 .section-title {
     font-size: 22px;
     font-weight: 600;
-    color: #f2f3f5;
+    color: #f2f4f8;
     margin-bottom: 4px;
 }
 .section-sub {
-    color: #8a919e;
+    color: #8994a6;
     font-size: 14px;
     margin-bottom: 18px;
 }
@@ -139,19 +187,19 @@ p, span, label, .stMarkdown, h1, h2, h3, h4, h5 {
     border: 1px solid transparent;
 }
 .result-green {
-    background: rgba(46,158,82,0.12);
-    border-left: 4px solid #3ddc84;
-    border-color: rgba(61,220,132,0.2);
-    color: #cdf5da;
+    background: rgba(34,197,94,0.10);
+    border-left: 4px solid #22c55e;
+    border-color: rgba(34,197,94,0.2);
+    color: #c9f5d8;
 }
 .result-blue {
-    background: rgba(79,209,197,0.10);
-    border-left: 4px solid #4fd1c5;
-    border-color: rgba(79,209,197,0.2);
-    color: #cdeeec;
+    background: rgba(59,130,246,0.10);
+    border-left: 4px solid #3b82f6;
+    border-color: rgba(59,130,246,0.2);
+    color: #cfe0ff;
 }
 .result-amber {
-    background: rgba(224,165,44,0.12);
+    background: rgba(224,165,44,0.10);
     border-left: 4px solid #e0a52c;
     border-color: rgba(224,165,44,0.2);
     color: #f5e2bd;
@@ -166,78 +214,64 @@ p, span, label, .stMarkdown, h1, h2, h3, h4, h5 {
 .tile {
     flex: 1;
     min-width: 140px;
-    background: linear-gradient(180deg, #20242c 0%, #1a1d23 100%);
+    background: linear-gradient(180deg, #181d27 0%, #12151c 100%);
     border-radius: 14px;
     padding: 16px 18px;
-    border: 1px solid #2c3038;
+    border: 1px solid #232a38;
     text-align: center;
     transition: transform 0.15s ease, border-color 0.15s ease;
 }
 .tile:hover {
     transform: translateY(-2px);
-    border-color: #3ddc84;
+    border-color: #3b82f6;
 }
 .tile .label {
     font-size: 12px;
-    color: #8a919e;
+    color: #8994a6;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 .tile .value {
     font-size: 24px;
     font-weight: 700;
-    background: linear-gradient(90deg, #7ee68b, #4fd1c5);
+    background: linear-gradient(90deg, #5eb1ff, #7c8cff);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     margin-top: 4px;
 }
 
-/* Radio menu styled as pill nav */
-div[role="radiogroup"] {
-    gap: 8px;
-    flex-wrap: wrap;
-}
-div[role="radiogroup"] label {
-    background: #1a1d24;
-    border: 1px solid #2c3038;
-    padding: 8px 18px;
-    border-radius: 999px;
-    transition: all 0.15s ease-in-out;
-    color: #c7cbd2 !important;
-}
-div[role="radiogroup"] label:hover {
-    border-color: #3ddc84;
-    color: #3ddc84 !important;
-}
-
 /* Inputs */
 .stTextInput input, .stNumberInput input, .stSelectbox div[data-baseweb="select"] > div {
-    background-color: #1a1d24 !important;
-    color: #e6e8eb !important;
-    border: 1px solid #2c3038 !important;
+    background-color: #161a22 !important;
+    color: #e7eaf0 !important;
+    border: 1px solid #232a38 !important;
     border-radius: 10px !important;
+}
+.stTextInput input:focus, .stNumberInput input:focus {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 2px rgba(59,130,246,0.25) !important;
 }
 
 /* Buttons */
 .stButton>button, .stFormSubmitButton>button {
-    background: linear-gradient(135deg, #3ddc84, #22a6b3);
-    color: #0a0b0e;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: #ffffff;
     border: none;
     border-radius: 10px;
     padding: 10px 22px;
     font-weight: 600;
-    box-shadow: 0 4px 16px rgba(61,220,132,0.25);
+    box-shadow: 0 4px 16px rgba(37,99,235,0.35);
 }
 .stButton>button:hover, .stFormSubmitButton>button:hover {
-    background: linear-gradient(135deg, #2fc873, #1c8e99);
-    color: #0a0b0e;
+    background: linear-gradient(135deg, #1d4ed8, #1e40af);
+    color: #ffffff;
 }
 
 /* Chat bubbles look a little softer */
 [data-testid="stChatMessage"] {
     border-radius: 14px;
-    background: #1a1d24;
-    border: 1px solid #2a2e37;
+    background: #161a22;
+    border: 1px solid #232a38;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -565,7 +599,7 @@ elif menu == "🦠 Disease Detection":
                     contents=[prompt, img]
                 )
 
-                st.markdown('<div class="section-sub" style="color:#3ddc84; font-weight:600;">✅ Analysis Result</div>', unsafe_allow_html=True)
+                st.markdown('<div class="section-sub" style="color:#5eb1ff; font-weight:600;">✅ Analysis Result</div>', unsafe_allow_html=True)
                 result_card(response.text.replace("\n", "<br>"), "green")
 
         except Exception as e:
