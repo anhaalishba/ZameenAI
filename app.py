@@ -12,13 +12,15 @@ from PIL import Image
 # CONFIG
 # =============================
 st.set_page_config(
-    page_title="🌾 ZameenAI Ultra",
+    page_title="ZameenAI Ultra",
+    page_icon="🌾",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
 API_KEY = st.secrets["OPENWEATHER_API_KEY"]
 gemini_client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
+
 # =============================
 # GROQ CLIENT (ONLY 1 API)
 # =============================
@@ -57,58 +59,231 @@ def is_farming_question(text):
     return any(word in text.lower() for word in FARMING_KEYWORDS)
 
 # =============================
-# HEADER
+# THEME / CUSTOM CSS
 # =============================
-st.title("🌾 ZameenAI Ultra")
-st.caption("AI Powered Smart Farming Decision System")
+st.markdown("""
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+html, body, [class*="css"]  {
+    font-family: 'Poppins', sans-serif;
+}
+
+.stApp {
+    background: linear-gradient(180deg, #f6faf3 0%, #eef6e9 100%);
+}
+
+/* Hide default streamlit chrome a bit */
+#MainMenu, footer {visibility: hidden;}
+
+/* Hero header */
+.hero {
+    background: linear-gradient(135deg, #1f7a3f 0%, #2e9e52 45%, #7bc96f 100%);
+    padding: 34px 40px;
+    border-radius: 20px;
+    margin-bottom: 22px;
+    box-shadow: 0 10px 30px rgba(31,122,63,0.25);
+}
+.hero h1 {
+    color: white;
+    font-size: 34px;
+    font-weight: 700;
+    margin: 0;
+}
+.hero p {
+    color: #e7f7e9;
+    font-size: 15px;
+    margin-top: 6px;
+    margin-bottom: 0;
+}
+
+/* Section card wrapper */
+.section-card {
+    background: white;
+    border-radius: 18px;
+    padding: 26px 28px;
+    box-shadow: 0 6px 20px rgba(31,122,63,0.08);
+    border: 1px solid #e5f0e0;
+    margin-bottom: 20px;
+}
+
+.section-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: #1f5a30;
+    margin-bottom: 4px;
+}
+.section-sub {
+    color: #6b8a71;
+    font-size: 14px;
+    margin-bottom: 18px;
+}
+
+/* Result / info cards */
+.result-card {
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin-top: 12px;
+    font-size: 15px;
+    line-height: 1.5;
+}
+.result-green {
+    background: #e9f7ec;
+    border-left: 5px solid #2e9e52;
+    color: #1f5a30;
+}
+.result-blue {
+    background: #eaf2fb;
+    border-left: 5px solid #3b82c4;
+    color: #1a3b57;
+}
+.result-amber {
+    background: #fff6e6;
+    border-left: 5px solid #e0a52c;
+    color: #6b4e14;
+}
+
+/* Metric-style tiles */
+.tile-row {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+.tile {
+    flex: 1;
+    min-width: 140px;
+    background: #f5faf2;
+    border-radius: 14px;
+    padding: 16px 18px;
+    border: 1px solid #e0efd8;
+    text-align: center;
+}
+.tile .label {
+    font-size: 12px;
+    color: #6b8a71;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.tile .value {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1f5a30;
+    margin-top: 4px;
+}
+
+/* Radio menu styled as pill nav */
+div[role="radiogroup"] {
+    gap: 8px;
+    flex-wrap: wrap;
+}
+div[role="radiogroup"] label {
+    background: white;
+    border: 1px solid #d8ead2;
+    padding: 8px 18px;
+    border-radius: 999px;
+    transition: all 0.15s ease-in-out;
+}
+div[role="radiogroup"] label:hover {
+    border-color: #2e9e52;
+}
+
+/* Buttons */
+.stButton>button, .stFormSubmitButton>button {
+    background: linear-gradient(135deg, #2e9e52, #1f7a3f);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 22px;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(46,158,82,0.3);
+}
+.stButton>button:hover, .stFormSubmitButton>button:hover {
+    background: linear-gradient(135deg, #1f7a3f, #185f31);
+    color: white;
+}
+
+/* Chat bubbles look a little softer */
+[data-testid="stChatMessage"] {
+    border-radius: 14px;
+}
+</style>
+""", unsafe_allow_html=True)
+
+
+def result_card(text, style="green"):
+    st.markdown(f'<div class="result-card result-{style}">{text}</div>', unsafe_allow_html=True)
+
+
+# =============================
+# HERO HEADER
+# =============================
+st.markdown("""
+<div class="hero">
+    <h1>🌾 ZameenAI Ultra</h1>
+    <p>AI-Powered Smart Farming Decision System — weather, disease detection, market insights & advisory, all in one place.</p>
+</div>
+""", unsafe_allow_html=True)
 
 # =============================
 # MENU
 # =============================
 menu = st.radio(
-    "Navigation Menu", 
-    ["🌦 Weather", "🦠 Disease Detection", "💬 Chatbot","🤖 Smart Advisory","🌾 Crop Estimator", "🧪 Fertilizer AI",  "📈 Market & Profit", "📅 Crop Calendar"],
+    "Navigation Menu",
+    ["🌦 Weather", "🦠 Disease Detection", "💬 Chatbot", "🤖 Smart Advisory",
+     "🌾 Crop Estimator", "🧪 Fertilizer AI", "📈 Market & Profit", "📅 Crop Calendar"],
     horizontal=True,
     label_visibility="collapsed"
 )
 
+st.write("")
+
 # =============================
 # WEATHER
 # =============================
-
 if menu == "🌦 Weather":
 
-    st.subheader("🌦 Live Weather")
-    city = st.text_input("Enter City Name")
+    st.markdown('<div class="section-card">', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">🌦 Live Weather</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-sub">Check current conditions for your farm location.</div>', unsafe_allow_html=True)
 
-    if st.button("Get Weather"):
+    col1, col2 = st.columns([3, 1])
+    with col1:
+        city = st.text_input("Enter City Name", label_visibility="collapsed", placeholder="Enter city name e.g. Multan")
+    with col2:
+        get_weather = st.button("Get Weather", use_container_width=True)
 
+    if get_weather:
         url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={API_KEY}&units=metric"
-
         response = requests.get(url)
         data = response.json()
 
         if data["cod"] == 200:
-
             temp = data["main"]["temp"]
             wind = data["wind"]["speed"]
             humidity = data["main"]["humidity"]
             description = data["weather"][0]["description"]
 
-            st.success(f"🌡 Temperature: {temp}°C")
-            st.info(f"💨 Wind Speed: {wind} m/s")
-            st.write(f"💧 Humidity: {humidity}%")
-            st.write(f"🌥 Condition: {description}")
-
+            st.markdown(f"""
+            <div class="tile-row">
+                <div class="tile"><div class="label">Temperature</div><div class="value">{temp}°C</div></div>
+                <div class="tile"><div class="label">Wind Speed</div><div class="value">{wind} m/s</div></div>
+                <div class="tile"><div class="label">Humidity</div><div class="value">{humidity}%</div></div>
+                <div class="tile"><div class="label">Condition</div><div class="value" style="font-size:16px; text-transform:capitalize;">{description}</div></div>
+            </div>
+            """, unsafe_allow_html=True)
         else:
-            st.error("City not found")
+            result_card("❌ City not found", "amber")
+
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # =============================
 # CROP ESTIMATOR
 # =============================
 elif menu == "🌾 Crop Estimator":
 
-    st.subheader("🌾 Crop Cost & Yield Estimator")
+    st.markdown('<div class="section-card">', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">🌾 Crop Cost & Yield Estimator</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-sub">Estimate cost and yield based on land area.</div>', unsafe_allow_html=True)
 
     crops = {
         "Wheat": {"cost": 50000, "yield": 30},
@@ -118,19 +293,30 @@ elif menu == "🌾 Crop Estimator":
         "Cotton": {"cost": 70000, "yield": 25}
     }
 
-    crop = st.selectbox("Select Crop", list(crops.keys()))
-    area = st.number_input("Land Area (acres)", min_value=1)
+    col1, col2 = st.columns(2)
+    with col1:
+        crop = st.selectbox("Select Crop", list(crops.keys()))
+    with col2:
+        area = st.number_input("Land Area (acres)", min_value=1)
 
     if st.button("Calculate"):
-        st.success(f"💰 Cost: Rs {crops[crop]['cost'] * area}")
-        st.info(f"🌾 Yield: {crops[crop]['yield'] * area} maunds")
+        st.markdown(f"""
+        <div class="tile-row">
+            <div class="tile"><div class="label">Estimated Cost</div><div class="value">Rs {crops[crop]['cost'] * area:,}</div></div>
+            <div class="tile"><div class="label">Estimated Yield</div><div class="value">{crops[crop]['yield'] * area} maunds</div></div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # =============================
 # MARKET & PROFIT
 # =============================
 elif menu == "📈 Market & Profit":
 
-    st.subheader("📈 Profit Predictor")
+    st.markdown('<div class="section-card">', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">📈 Profit Predictor</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-sub">Predict revenue and profit for your crop and land size.</div>', unsafe_allow_html=True)
 
     prices = {
         "Wheat": 3900,
@@ -140,52 +326,70 @@ elif menu == "📈 Market & Profit":
         "Cotton": 8500
     }
 
-    crop = st.selectbox("Crop", list(prices.keys()))
-    area = st.number_input("Land Area (acres)", min_value=1)
+    col1, col2 = st.columns(2)
+    with col1:
+        crop = st.selectbox("Crop", list(prices.keys()))
+    with col2:
+        area = st.number_input("Land Area (acres)", min_value=1)
 
     if st.button("Predict"):
         revenue = prices[crop] * area * 30
         cost = 50000 * area
-        st.success(f"💰 Revenue: Rs {revenue}")
-        st.info(f"🏆 Profit: Rs {revenue - cost}")
+        profit = revenue - cost
+        profit_style = "green" if profit >= 0 else "amber"
+
+        st.markdown(f"""
+        <div class="tile-row">
+            <div class="tile"><div class="label">Revenue</div><div class="value">Rs {revenue:,}</div></div>
+            <div class="tile"><div class="label">Estimated Cost</div><div class="value">Rs {cost:,}</div></div>
+        </div>
+        """, unsafe_allow_html=True)
+        result_card(f"🏆 <b>Profit: Rs {profit:,}</b>", profit_style)
+
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # =============================
 # FERTILIZER AI
 # =============================
 elif menu == "🧪 Fertilizer AI":
 
-    st.subheader("🧪 Fertilizer Recommendation")
-    crop = st.text_input("Crop Name")
+    st.markdown('<div class="section-card">', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">🧪 Fertilizer Recommendation</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-sub">Get a quick fertilizer suggestion for your crop.</div>', unsafe_allow_html=True)
 
-    if st.button("Recommend"):
+    col1, col2 = st.columns([3, 1])
+    with col1:
+        crop = st.text_input("Crop Name", label_visibility="collapsed", placeholder="e.g. Wheat, Rice, Cotton")
+    with col2:
+        recommend = st.button("Recommend", use_container_width=True)
+
+    if recommend:
         if crop.lower() == "wheat":
-            st.success("Use Urea + DAP in split doses")
+            result_card("✅ Use Urea + DAP in split doses", "green")
         elif crop.lower() == "rice":
-            st.success("Use NPK 20-20-20, maintain flooded field")
+            result_card("✅ Use NPK 20-20-20, maintain flooded field", "green")
         else:
-            st.info("Use balanced NPK with organic compost")
+            result_card("ℹ️ Use balanced NPK with organic compost", "blue")
 
-# =============================
-# CROP CALENDAR
-# =============================
+    st.markdown('</div>', unsafe_allow_html=True)
+
 # =============================
 # CROP CALENDAR (WITH DROPDOWN)
 # =============================
 elif menu == "📅 Crop Calendar":
-    st.subheader("📅 Pakistan Crop Calendar")
-    st.write("Select a month to see the recommended agricultural activities.")
 
-    # List of months for the dropdown
+    st.markdown('<div class="section-card">', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">📅 Pakistan Crop Calendar</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-sub">Select a month to see the recommended agricultural activities.</div>', unsafe_allow_html=True)
+
     months_list = [
-        "January", "February", "March", "April", "May", "June", 
+        "January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December"
     ]
-    
-    # Get current month to set as default index
+
     current_month_str = datetime.datetime.now().strftime("%B")
     default_index = months_list.index(current_month_str)
-    
-    # Expanded Calendar Data
+
     calendar_data = {
         "January": "🌾 **Wheat:** Apply second irrigation and urea. Prepare land for spring vegetables like gourds.",
         "February": "🥔 **Potato:** Harvesting begins. **Sugarcane:** Ideal time for spring planting.",
@@ -201,27 +405,32 @@ elif menu == "📅 Crop Calendar":
         "December": "🥦 **Vegetables:** Care for winter crops (Cabbage, Radish). **Wheat:** Apply first irrigation (Kor) 20-25 days after sowing."
     }
 
-    # Month Selection Dropdown
     selected_month = st.selectbox("Select Month:", months_list, index=default_index)
 
-    # Displaying the Result
-    st.markdown(f"---")
-    st.markdown(f"### 🗓️ Agricultural Activities for **{selected_month}**")
-    st.success(calendar_data.get(selected_month))
-    
-    # Highlight if it's the current month
+    st.markdown(f"#### 🗓️ Agricultural Activities for **{selected_month}**")
+    result_card(calendar_data.get(selected_month), "green")
+
     if selected_month == current_month_str:
-        st.info(f"✨ **Note:** This is the current month. Prioritize these tasks for your farm.")
+        result_card("✨ <b>Note:</b> This is the current month. Prioritize these tasks for your farm.", "blue")
+
+    st.markdown('</div>', unsafe_allow_html=True)
+
 # =============================
 # SMART ADVISORY (AI)
 # =============================
 elif menu == "🤖 Smart Advisory":
 
-    st.subheader("🤖 AI Farming Advisory")
+    st.markdown('<div class="section-card">', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">🤖 AI Farming Advisory</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-sub">Get a tailored recommendation based on your crop, soil, and season.</div>', unsafe_allow_html=True)
 
-    crop = st.text_input("Crop")
-    soil = st.selectbox("Soil Type", ["Sandy", "Clay", "Loamy"])
-    season = st.selectbox("Season", ["Summer", "Winter", "Monsoon", "Spring"])
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        crop = st.text_input("Crop")
+    with col2:
+        soil = st.selectbox("Soil Type", ["Sandy", "Clay", "Loamy"])
+    with col3:
+        season = st.selectbox("Season", ["Summer", "Winter", "Monsoon", "Spring"])
 
     if st.button("Generate Advisory"):
         prompt = f"""
@@ -230,32 +439,38 @@ elif menu == "🤖 Smart Advisory":
         Season: {season}
         Give farming advice.
         """
-        response = client.responses.create(
-            model="openai/gpt-oss-20b",
-            input=[
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": prompt}
-            ],
-            max_output_tokens=1000
-        )
-        st.write(response.output_text)
+        with st.spinner("Generating advisory..."):
+            response = client.responses.create(
+                model="openai/gpt-oss-20b",
+                input=[
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "user", "content": prompt}
+                ],
+                max_output_tokens=1000
+            )
+        result_card(response.output_text.replace("\n", "<br>"), "green")
+
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # =============================
 # CHATBOT (FARMING ONLY)
 # =============================
 elif menu == "💬 Chatbot":
 
-    st.subheader("💬 Farming Assistant Chatbot")
+    st.markdown('<div class="section-card">', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">💬 Farming Assistant Chatbot</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-sub">Ask anything about crops, soil, pests, or irrigation.</div>', unsafe_allow_html=True)
 
     if "messages" not in st.session_state:
         st.session_state.messages = []
 
-    for msg in st.session_state.messages:
-        st.chat_message(msg["role"]).write(msg["content"])
+    chat_box = st.container(height=420)
+    with chat_box:
+        for msg in st.session_state.messages:
+            st.chat_message(msg["role"]).write(msg["content"])
 
     if user_input := st.chat_input("Ask farming question..."):
         st.session_state.messages.append({"role": "user", "content": user_input})
-        st.chat_message("user").write(user_input)
 
         if not is_farming_question(user_input):
             reply = "🌾 I can only help with farming and agriculture-related questions."
@@ -271,60 +486,57 @@ elif menu == "💬 Chatbot":
             reply = response.output_text
 
         st.session_state.messages.append({"role": "assistant", "content": reply})
-        st.chat_message("assistant").write(reply)
+        st.rerun()
 
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # =============================
 # DISEASE DETECTION (BYPASS 403)
 # =============================
 elif menu == "🦠 Disease Detection":
-    st.subheader("🦠 Crop Disease Detection")
-    st.write("Take a picture of crop or upload")
+
+    st.markdown('<div class="section-card">', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">🦠 Crop Disease Detection</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-sub">Take a picture of the crop leaf or upload one for instant AI analysis.</div>', unsafe_allow_html=True)
 
     # Form use karne se Axios error bypass ho jata hai
     with st.form("disease_form", clear_on_submit=True):
-        # Option 1: Mobile Camera (Best for farmers)
-        cam_image = st.camera_input("Take a photo of the leaf")
-        
-        # Option 2: File Upload (If camera not available)
-        file_image = st.file_uploader("Select File", type=["jpg", "jpeg", "png"])
-        
-        submit_button = st.form_submit_button("Check Disease")
+        col1, col2 = st.columns(2)
+        with col1:
+            cam_image = st.camera_input("Take a photo of the leaf")
+        with col2:
+            file_image = st.file_uploader("Select File", type=["jpg", "jpeg", "png"])
 
-    # Image processing logic
+        submit_button = st.form_submit_button("Check Disease", use_container_width=True)
+
     target_image = cam_image if cam_image is not None else file_image
 
     if target_image is not None and submit_button:
         try:
-            # Step 1: Image ko open aur compress karein
             img = Image.open(target_image)
-            
-            # AI ke liye 1024px kafi hai, is se Axios crash nahi hota
             img.thumbnail((1024, 1024))
-            
-            # st.image(img, caption="Processing Image...", width=300)
 
             with st.spinner("Checking..."):
-                # prompt
                 prompt = """
-                    You are an expert plant pathologist for Pakistan's crops. 
-                    Analyze this image of a  plant. 
+                    You are an expert plant pathologist for Pakistan's crops.
+                    Analyze this image of a  plant.
                     1. Name the disease.
                     2. Give a brief explanation of why it happened.
                     3. Suggest organic (desi) and chemical remedies.
                     4.Answer briefly in 200 words max.
                     If the plant is healthy, congratulate the farmer.
                     """
-                
-                # Gemini Client Call
+
                 response = gemini_client.models.generate_content(
                     model="gemini-2.5-flash",
                     contents=[prompt, img]
                 )
-                
+
                 st.success("✅ Analysis Result:")
-                st.markdown(response.text)
+                result_card(response.text.replace("\n", "<br>"), "green")
 
         except Exception as e:
-            st.error(f"Error: {e}")
+            result_card(f"❌ Error: {e}", "amber")
             st.warning("Agar Axios 403 aaye, toh photo ka size kam karein ya camera input use karein.")
+
+    st.markdown('</div>', unsafe_allow_html=True)
