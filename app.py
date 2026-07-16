@@ -70,28 +70,38 @@ html, body, [class*="css"]  {
 }
 
 .stApp {
-    background: linear-gradient(180deg, #f6faf3 0%, #eef6e9 100%);
+    background: radial-gradient(circle at top left, #1c2028 0%, #0f1115 55%, #0a0b0e 100%);
+    color: #e6e8eb;
 }
 
 /* Hide default streamlit chrome a bit */
 #MainMenu, footer {visibility: hidden;}
 
+/* Make default streamlit text light on dark bg */
+p, span, label, .stMarkdown, h1, h2, h3, h4, h5 {
+    color: #e6e8eb;
+}
+
 /* Hero header */
 .hero {
-    background: linear-gradient(135deg, #1f7a3f 0%, #2e9e52 45%, #7bc96f 100%);
+    background: linear-gradient(135deg, #1e2128 0%, #262b35 60%, #2f3542 100%);
     padding: 34px 40px;
     border-radius: 20px;
     margin-bottom: 22px;
-    box-shadow: 0 10px 30px rgba(31,122,63,0.25);
+    border: 1px solid #333844;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.45);
 }
 .hero h1 {
-    color: white;
+    color: #ffffff;
     font-size: 34px;
     font-weight: 700;
     margin: 0;
+    background: linear-gradient(90deg, #7ee68b, #4fd1c5);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 .hero p {
-    color: #e7f7e9;
+    color: #b6bcc6;
     font-size: 15px;
     margin-top: 6px;
     margin-bottom: 0;
@@ -99,22 +109,22 @@ html, body, [class*="css"]  {
 
 /* Section card wrapper */
 .section-card {
-    background: white;
+    background: linear-gradient(180deg, #1a1d24 0%, #16181d 100%);
     border-radius: 18px;
     padding: 26px 28px;
-    box-shadow: 0 6px 20px rgba(31,122,63,0.08);
-    border: 1px solid #e5f0e0;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    border: 1px solid #2a2e37;
     margin-bottom: 20px;
 }
 
 .section-title {
     font-size: 22px;
     font-weight: 600;
-    color: #1f5a30;
+    color: #f2f3f5;
     margin-bottom: 4px;
 }
 .section-sub {
-    color: #6b8a71;
+    color: #8a919e;
     font-size: 14px;
     margin-bottom: 18px;
 }
@@ -125,22 +135,26 @@ html, body, [class*="css"]  {
     padding: 18px 20px;
     margin-top: 12px;
     font-size: 15px;
-    line-height: 1.5;
+    line-height: 1.6;
+    border: 1px solid transparent;
 }
 .result-green {
-    background: #e9f7ec;
-    border-left: 5px solid #2e9e52;
-    color: #1f5a30;
+    background: rgba(46,158,82,0.12);
+    border-left: 4px solid #3ddc84;
+    border-color: rgba(61,220,132,0.2);
+    color: #cdf5da;
 }
 .result-blue {
-    background: #eaf2fb;
-    border-left: 5px solid #3b82c4;
-    color: #1a3b57;
+    background: rgba(79,209,197,0.10);
+    border-left: 4px solid #4fd1c5;
+    border-color: rgba(79,209,197,0.2);
+    color: #cdeeec;
 }
 .result-amber {
-    background: #fff6e6;
-    border-left: 5px solid #e0a52c;
-    color: #6b4e14;
+    background: rgba(224,165,44,0.12);
+    border-left: 4px solid #e0a52c;
+    border-color: rgba(224,165,44,0.2);
+    color: #f5e2bd;
 }
 
 /* Metric-style tiles */
@@ -152,22 +166,29 @@ html, body, [class*="css"]  {
 .tile {
     flex: 1;
     min-width: 140px;
-    background: #f5faf2;
+    background: linear-gradient(180deg, #20242c 0%, #1a1d23 100%);
     border-radius: 14px;
     padding: 16px 18px;
-    border: 1px solid #e0efd8;
+    border: 1px solid #2c3038;
     text-align: center;
+    transition: transform 0.15s ease, border-color 0.15s ease;
+}
+.tile:hover {
+    transform: translateY(-2px);
+    border-color: #3ddc84;
 }
 .tile .label {
     font-size: 12px;
-    color: #6b8a71;
+    color: #8a919e;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 .tile .value {
     font-size: 24px;
     font-weight: 700;
-    color: #1f5a30;
+    background: linear-gradient(90deg, #7ee68b, #4fd1c5);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
     margin-top: 4px;
 }
 
@@ -177,34 +198,46 @@ div[role="radiogroup"] {
     flex-wrap: wrap;
 }
 div[role="radiogroup"] label {
-    background: white;
-    border: 1px solid #d8ead2;
+    background: #1a1d24;
+    border: 1px solid #2c3038;
     padding: 8px 18px;
     border-radius: 999px;
     transition: all 0.15s ease-in-out;
+    color: #c7cbd2 !important;
 }
 div[role="radiogroup"] label:hover {
-    border-color: #2e9e52;
+    border-color: #3ddc84;
+    color: #3ddc84 !important;
+}
+
+/* Inputs */
+.stTextInput input, .stNumberInput input, .stSelectbox div[data-baseweb="select"] > div {
+    background-color: #1a1d24 !important;
+    color: #e6e8eb !important;
+    border: 1px solid #2c3038 !important;
+    border-radius: 10px !important;
 }
 
 /* Buttons */
 .stButton>button, .stFormSubmitButton>button {
-    background: linear-gradient(135deg, #2e9e52, #1f7a3f);
-    color: white;
+    background: linear-gradient(135deg, #3ddc84, #22a6b3);
+    color: #0a0b0e;
     border: none;
     border-radius: 10px;
     padding: 10px 22px;
     font-weight: 600;
-    box-shadow: 0 4px 12px rgba(46,158,82,0.3);
+    box-shadow: 0 4px 16px rgba(61,220,132,0.25);
 }
 .stButton>button:hover, .stFormSubmitButton>button:hover {
-    background: linear-gradient(135deg, #1f7a3f, #185f31);
-    color: white;
+    background: linear-gradient(135deg, #2fc873, #1c8e99);
+    color: #0a0b0e;
 }
 
 /* Chat bubbles look a little softer */
 [data-testid="stChatMessage"] {
     border-radius: 14px;
+    background: #1a1d24;
+    border: 1px solid #2a2e37;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -532,11 +565,11 @@ elif menu == "🦠 Disease Detection":
                     contents=[prompt, img]
                 )
 
-                st.success("✅ Analysis Result:")
+                st.markdown('<div class="section-sub" style="color:#3ddc84; font-weight:600;">✅ Analysis Result</div>', unsafe_allow_html=True)
                 result_card(response.text.replace("\n", "<br>"), "green")
 
         except Exception as e:
             result_card(f"❌ Error: {e}", "amber")
-            st.warning("Agar Axios 403 aaye, toh photo ka size kam karein ya camera input use karein.")
+            result_card("⚠️ Agar Axios 403 aaye, toh photo ka size kam karein ya camera input use karein.", "amber")
 
     st.markdown('</div>', unsafe_allow_html=True)
