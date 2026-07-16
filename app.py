@@ -125,10 +125,6 @@ div[role="radiogroup"] {
     gap: 8px;
     flex-wrap: wrap;
 }
-/* hide the native radio dot, keep only the pill */
-div[role="radiogroup"] label > div:first-child {
-    display: none !important;
-}
 div[role="radiogroup"] label {
     background: transparent;
     border: 1px solid #262e3d;
@@ -138,6 +134,14 @@ div[role="radiogroup"] label {
     color: #9aa5b6 !important;
     font-weight: 500;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+/* restyle the little radio circle instead of hiding it */
+div[role="radiogroup"] label [data-baseweb="radio"] > div {
+    background-color: transparent !important;
+    border-color: #3b4252 !important;
 }
 div[role="radiogroup"] label:hover {
     border-color: #3b82f6;
@@ -153,6 +157,9 @@ div[role="radiogroup"] label:has(input:checked) {
 div[role="radiogroup"] label:has(input:checked) p {
     color: #ffffff !important;
     font-weight: 600;
+}
+div[role="radiogroup"] label:has(input:checked) [data-baseweb="radio"] > div {
+    border-color: #ffffff !important;
 }
 
 /* Section card wrapper */
