@@ -6,6 +6,7 @@ import datetime
 from openai import OpenAI
 from google import genai
 from PIL import Image
+from streamlit_mic_recorder import speech_to_text
 
 
 # =============================
@@ -239,39 +240,71 @@ elif menu == "🤖 Smart Advisory":
         st.write(response.output_text)
 
 # =============================
-# CHATBOT (FARMING ONLY)
+# CHATBOT (TEXT + VOICE)
 # =============================
 elif menu == "💬 Chatbot":
 
-    st.subheader("💬 Farming Assistant Chatbot")
+    st.subheader("💬🌾 Farming Assistant")
 
     if "messages" not in st.session_state:
         st.session_state.messages = []
 
+    # Show previous chat
     for msg in st.session_state.messages:
         st.chat_message(msg["role"]).write(msg["content"])
 
-    if user_input := st.chat_input("Ask farming question..."):
-        st.session_state.messages.append({"role": "user", "content": user_input})
+    st.markdown("### 🎤 Speak or Type Your Question")
+
+    # Voice Input
+    voice_input = speech_to_text(
+        language="ur-PK",   # Change to "ur-PK" if your browser supports Urdu
+        use_container_width=True,
+        just_once=True,
+        key="voice"
+    )
+
+    # Text Input
+    typed_input = st.chat_input("Ask a farming question...")
+
+    # Use whichever input is available
+    user_input = typed_input if typed_input else voice_input
+
+    if user_input:
+
+        st.session_state.messages.append(
+            {"role": "user", "content": user_input}
+        )
+
         st.chat_message("user").write(user_input)
 
         if not is_farming_question(user_input):
+
             reply = "🌾 I can only help with farming and agriculture-related questions."
+
         else:
+
             response = client.responses.create(
                 model="openai/gpt-oss-20b",
                 input=[
-                    {"role": "system", "content": SYSTEM_PROMPT},
-                    {"role": "user", "content": user_input}
+                    {
+                        "role": "system",
+                        "content": SYSTEM_PROMPT
+                    },
+                    {
+                        "role": "user",
+                        "content": user_input
+                    }
                 ],
                 max_output_tokens=1000
             )
+
             reply = response.output_text
 
-        st.session_state.messages.append({"role": "assistant", "content": reply})
+        st.session_state.messages.append(
+            {"role": "assistant", "content": reply}
+        )
+
         st.chat_message("assistant").write(reply)
-
-
 # =============================
 # DISEASE DETECTION (BYPASS 403)
 # =============================
