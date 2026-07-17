@@ -6,14 +6,14 @@ import datetime
 from openai import OpenAI
 from google import genai
 from PIL import Image
-from streamlit_mic_recorder import speech_to_text
 
 
 # =============================
 # CONFIG
 # =============================
 st.set_page_config(
-    page_title="🌾 ZameenAI",
+    page_title="ZameenAI | Smart Farming",
+    page_icon="🌾",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
@@ -75,18 +75,296 @@ FARMING_KEYWORDS = [
 def is_farming_question(text):
     return any(word in text.lower() for word in FARMING_KEYWORDS)
 
+
 # =============================
-# HEADER
+# GLOBAL THEME / CSS
 # =============================
-st.title("🌾 ZameenAI")
-st.caption("AI Powered Smart Farming Decision System")
+st.markdown("""
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap');
+
+html, body, [class*="css"] {
+    font-family: 'Inter', sans-serif;
+}
+
+/* ---------- App background ---------- */
+[data-testid="stAppViewContainer"] {
+    background: radial-gradient(circle at 20% 0%, #10201c 0%, #0b0f0e 45%, #08090a 100%);
+    color: #e7ece9;
+}
+[data-testid="stHeader"] {
+    background: transparent;
+}
+[data-testid="stToolbar"] { right: 1rem; }
+
+.block-container {
+    padding-top: 1.2rem;
+    padding-bottom: 3rem;
+    max-width: 1200px;
+}
+
+/* ---------- Scrollbar ---------- */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: #0b0f0e; }
+::-webkit-scrollbar-thumb { background: #1f2b28; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: #14b8a6; }
+
+/* ---------- Hero / Navbar ---------- */
+.zameen-hero {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 26px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #131c1a 0%, #0d1513 100%);
+    border: 1px solid #1f2b27;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+    margin-bottom: 18px;
+}
+.zameen-hero-left { display: flex; align-items: center; gap: 14px; }
+.zameen-logo-badge {
+    width: 52px; height: 52px;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px;
+    background: linear-gradient(135deg, #0f766e, #134e4a);
+    box-shadow: 0 0 22px rgba(20,184,166,0.35);
+}
+.zameen-hero h1 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 800;
+    font-size: 26px;
+    margin: 0;
+    background: linear-gradient(90deg, #5eead4, #34d399, #a7f3d0);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    letter-spacing: 0.3px;
+}
+.zameen-hero p {
+    margin: 2px 0 0 0;
+    color: #9fb3ac;
+    font-size: 13.5px;
+}
+.zameen-hero-right {
+    display: flex; align-items: center; gap: 8px;
+    color: #7fd8c4; font-size: 12.5px;
+    background: rgba(20,184,166,0.08);
+    border: 1px solid rgba(20,184,166,0.25);
+    padding: 7px 14px; border-radius: 30px;
+}
+.pulse-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #34d399;
+    box-shadow: 0 0 0 0 rgba(52,211,153,0.7);
+    animation: pulse 1.8s infinite;
+}
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(52,211,153,0.55); }
+    70% { box-shadow: 0 0 0 8px rgba(52,211,153,0); }
+    100% { box-shadow: 0 0 0 0 rgba(52,211,153,0); }
+}
+
+/* ---------- Nav (radio as pill tabs) ---------- */
+div[data-testid="stRadio"] > label { display: none; }
+div[data-testid="stRadio"] > div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    background: #101513;
+    padding: 10px;
+    border-radius: 16px;
+    border: 1px solid #1f2b27;
+    margin-bottom: 22px;
+}
+div[data-testid="stRadio"] label {
+    background: #161f1c;
+    border: 1px solid #22302b;
+    padding: 9px 18px;
+    border-radius: 30px;
+    color: #9fb3ac;
+    font-weight: 500;
+    font-size: 14.5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+div[data-testid="stRadio"] label:hover {
+    border-color: #2dd4bf;
+    color: #5eead4;
+}
+div[data-testid="stRadio"] label:has(input:checked) {
+    background: linear-gradient(135deg, #0f766e, #115e59);
+    border-color: #2dd4bf;
+    color: #ffffff;
+    box-shadow: 0 0 18px rgba(45,212,191,0.35);
+}
+div[data-testid="stRadio"] label > div:first-child { display: none; }
+
+/* ---------- Cards ---------- */
+.zameen-card {
+    background: linear-gradient(180deg, #121b18 0%, #0e1513 100%);
+    border: 1px solid #1f2b27;
+    border-radius: 18px;
+    padding: 24px 26px;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+.zameen-card-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid #1c2724;
+}
+.zameen-icon-badge {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 21px;
+    background: rgba(20,184,166,0.1);
+    border: 1px solid rgba(20,184,166,0.25);
+}
+.zameen-card-header .titles h3 {
+    margin: 0; font-family: 'Poppins', sans-serif;
+    color: #e7ece9; font-size: 18px; font-weight: 600;
+}
+.zameen-card-header .titles p {
+    margin: 2px 0 0 0; color: #8ea39c; font-size: 13px;
+}
+
+/* ---------- Inputs ---------- */
+.stTextInput input, .stNumberInput input, .stSelectbox div[data-baseweb="select"] > div {
+    background-color: #0d1513 !important;
+    border: 1px solid #223530 !important;
+    color: #e7ece9 !important;
+    border-radius: 10px !important;
+}
+.stTextInput input:focus, .stNumberInput input:focus {
+    border-color: #2dd4bf !important;
+    box-shadow: 0 0 0 1px #2dd4bf !important;
+}
+label, .stMarkdown p { color: #cddad5 !important; }
+
+/* ---------- Buttons ---------- */
+.stButton > button, .stFormSubmitButton > button {
+    background: linear-gradient(135deg, #0f766e, #0d9488) !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 12px !important;
+    padding: 10px 22px !important;
+    font-weight: 600 !important;
+    box-shadow: 0 6px 18px rgba(13,148,136,0.3) !important;
+    transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+}
+.stButton > button:hover, .stFormSubmitButton > button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 22px rgba(45,212,191,0.4) !important;
+}
+
+/* ---------- Alerts (success/info/error) restyled ---------- */
+[data-testid="stAlert"] {
+    background: #0d1513 !important;
+    border-radius: 12px !important;
+    border: 1px solid #223530 !important;
+    color: #e7ece9 !important;
+}
+
+/* ---------- Metric cards ---------- */
+.metric-box {
+    background: #0d1513;
+    border: 1px solid #1f2b27;
+    border-radius: 14px;
+    padding: 16px;
+    text-align: center;
+    transition: all .2s ease;
+}
+.metric-box:hover { border-color: #2dd4bf; }
+.metric-icon { font-size: 24px; margin-bottom: 6px; }
+.metric-label { color: #8ea39c; font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.5px; }
+.metric-value { color: #5eead4; font-size: 20px; font-weight: 700; font-family: 'Poppins', sans-serif; margin-top: 2px; }
+
+/* ---------- Result box (AI outputs) ---------- */
+.ai-result-box {
+    background: #0d1513;
+    border-left: 4px solid #2dd4bf;
+    border-radius: 10px;
+    padding: 18px 20px;
+    color: #dbe7e2;
+    line-height: 1.6;
+    font-size: 14.5px;
+}
+
+/* ---------- Calendar badge ---------- */
+.month-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #0f766e, #115e59);
+    color: #fff;
+    padding: 6px 16px;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 13px;
+    margin-bottom: 12px;
+}
+
+/* ---------- Chat ---------- */
+.stChatMessage { background: transparent !important; }
+[data-testid="stChatMessageContent"] {
+    background: #0d1513 !important;
+    border: 1px solid #1f2b27 !important;
+    border-radius: 14px !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
+
+def metric_card(col, icon, label, value):
+    col.markdown(f"""
+    <div class="metric-box">
+        <div class="metric-icon">{icon}</div>
+        <div class="metric-label">{label}</div>
+        <div class="metric-value">{value}</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+
+def card_header(icon, title, subtitle):
+    st.markdown(f"""
+    <div class="zameen-card-header">
+        <div class="zameen-icon-badge">{icon}</div>
+        <div class="titles">
+            <h3>{title}</h3>
+            <p>{subtitle}</p>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+
+# =============================
+# HERO HEADER
+# =============================
+st.markdown("""
+<div class="zameen-hero">
+    <div class="zameen-hero-left">
+        <div class="zameen-logo-badge">🌾</div>
+        <div>
+            <h1>ZameenAI</h1>
+            <p>AI Powered Smart Farming Decision System</p>
+        </div>
+    </div>
+    <div class="zameen-hero-right">
+        <span class="pulse-dot"></span> Live &nbsp;|&nbsp; Pakistan Edition
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
 # =============================
 # MENU
 # =============================
 menu = st.radio(
-    "Navigation Menu", 
-    ["🌦 Weather", "🦠 Disease Detection", "💬 Chatbot","🤖 Smart Advisory","🌾 Crop Estimator", "🧪 Fertilizer AI",  "📈 Market & Profit", "📅 Crop Calendar"],
+    "Navigation Menu",
+    ["🌦 Weather", "🦠 Disease Detection", "💬 Chatbot", "🤖 Smart Advisory",
+     "🌾 Crop Estimator", "🧪 Fertilizer AI", "📈 Market & Profit", "📅 Crop Calendar"],
     horizontal=True,
     label_visibility="collapsed"
 )
@@ -97,10 +375,16 @@ menu = st.radio(
 
 if menu == "🌦 Weather":
 
-    st.subheader("🌦 Live Weather")
-    city = st.text_input("Enter City Name")
+    st.markdown('<div class="zameen-card">', unsafe_allow_html=True)
+    card_header("🌦", "Live Weather", "Check real-time weather for your area")
 
-    if st.button("Get Weather"):
+    col_in1, col_in2 = st.columns([3, 1])
+    with col_in1:
+        city = st.text_input("Enter City Name", label_visibility="collapsed", placeholder="Enter city name (e.g. Multan)")
+    with col_in2:
+        get_weather = st.button("Get Weather", use_container_width=True)
+
+    if get_weather:
 
         url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={API_KEY}&units=metric"
 
@@ -114,20 +398,25 @@ if menu == "🌦 Weather":
             humidity = data["main"]["humidity"]
             description = data["weather"][0]["description"]
 
-            st.success(f"🌡 Temperature: {temp}°C")
-            st.info(f"💨 Wind Speed: {wind} m/s")
-            st.write(f"💧 Humidity: {humidity}%")
-            st.write(f"🌥 Condition: {description}")
+            st.markdown("<br>", unsafe_allow_html=True)
+            m1, m2, m3, m4 = st.columns(4)
+            metric_card(m1, "🌡", "Temperature", f"{temp}°C")
+            metric_card(m2, "💨", "Wind Speed", f"{wind} m/s")
+            metric_card(m3, "💧", "Humidity", f"{humidity}%")
+            metric_card(m4, "🌥", "Condition", description.title())
 
         else:
             st.error("City not found")
+
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # =============================
 # CROP ESTIMATOR
 # =============================
 elif menu == "🌾 Crop Estimator":
 
-    st.subheader("🌾 Crop Cost & Yield Estimator")
+    st.markdown('<div class="zameen-card">', unsafe_allow_html=True)
+    card_header("🌾", "Crop Cost & Yield Estimator", "Estimate cultivation cost and expected yield")
 
     crops = {
         "Wheat": {"cost": 50000, "yield": 30},
@@ -137,19 +426,31 @@ elif menu == "🌾 Crop Estimator":
         "Cotton": {"cost": 70000, "yield": 25}
     }
 
-    crop = st.selectbox("Select Crop", list(crops.keys()))
-    area = st.number_input("Land Area (acres)", min_value=1)
+    c1, c2, c3 = st.columns([2, 2, 1])
+    with c1:
+        crop = st.selectbox("Select Crop", list(crops.keys()))
+    with c2:
+        area = st.number_input("Land Area (acres)", min_value=1)
+    with c3:
+        st.write("")
+        st.write("")
+        calc_btn = st.button("Calculate", use_container_width=True)
 
-    if st.button("Calculate"):
-        st.success(f"💰 Cost: Rs {crops[crop]['cost'] * area}")
-        st.info(f"🌾 Yield: {crops[crop]['yield'] * area} maunds")
+    if calc_btn:
+        st.markdown("<br>", unsafe_allow_html=True)
+        m1, m2 = st.columns(2)
+        metric_card(m1, "💰", "Estimated Cost", f"Rs {crops[crop]['cost'] * area:,}")
+        metric_card(m2, "🌾", "Expected Yield", f"{crops[crop]['yield'] * area} maunds")
+
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # =============================
 # MARKET & PROFIT
 # =============================
 elif menu == "📈 Market & Profit":
 
-    st.subheader("📈 Profit Predictor")
+    st.markdown('<div class="zameen-card">', unsafe_allow_html=True)
+    card_header("📈", "Profit Predictor", "Forecast revenue and profit for your crop")
 
     prices = {
         "Wheat": 3900,
@@ -159,52 +460,68 @@ elif menu == "📈 Market & Profit":
         "Cotton": 8500
     }
 
-    crop = st.selectbox("Crop", list(prices.keys()))
-    area = st.number_input("Land Area (acres)", min_value=1)
+    c1, c2, c3 = st.columns([2, 2, 1])
+    with c1:
+        crop = st.selectbox("Crop", list(prices.keys()))
+    with c2:
+        area = st.number_input("Land Area (acres)", min_value=1)
+    with c3:
+        st.write("")
+        st.write("")
+        predict_btn = st.button("Predict", use_container_width=True)
 
-    if st.button("Predict"):
+    if predict_btn:
         revenue = prices[crop] * area * 30
         cost = 50000 * area
-        st.success(f"💰 Revenue: Rs {revenue}")
-        st.info(f"🏆 Profit: Rs {revenue - cost}")
+        st.markdown("<br>", unsafe_allow_html=True)
+        m1, m2 = st.columns(2)
+        metric_card(m1, "💰", "Revenue", f"Rs {revenue:,}")
+        metric_card(m2, "🏆", "Profit", f"Rs {revenue - cost:,}")
+
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # =============================
 # FERTILIZER AI
 # =============================
 elif menu == "🧪 Fertilizer AI":
 
-    st.subheader("🧪 Fertilizer Recommendation")
-    crop = st.text_input("Crop Name")
+    st.markdown('<div class="zameen-card">', unsafe_allow_html=True)
+    card_header("🧪", "Fertilizer Recommendation", "Get the right fertilizer plan for your crop")
 
-    if st.button("Recommend"):
+    c1, c2 = st.columns([3, 1])
+    with c1:
+        crop = st.text_input("Crop Name", label_visibility="collapsed", placeholder="Enter crop name (e.g. Wheat)")
+    with c2:
+        recommend_btn = st.button("Recommend", use_container_width=True)
+
+    if recommend_btn:
         if crop.lower() == "wheat":
-            st.success("Use Urea + DAP in split doses")
+            result = "Use Urea + DAP in split doses."
         elif crop.lower() == "rice":
-            st.success("Use NPK 20-20-20, maintain flooded field")
+            result = "Use NPK 20-20-20, maintain flooded field."
         else:
-            st.info("Use balanced NPK with organic compost")
+            result = "Use balanced NPK with organic compost."
 
-# =============================
-# CROP CALENDAR
-# =============================
+        st.markdown(f'<div class="ai-result-box">🧪 {result}</div>', unsafe_allow_html=True)
+
+    st.markdown('</div>', unsafe_allow_html=True)
+
 # =============================
 # CROP CALENDAR (WITH DROPDOWN)
 # =============================
 elif menu == "📅 Crop Calendar":
-    st.subheader("📅 Pakistan Crop Calendar")
-    st.write("Select a month to see the recommended agricultural activities.")
 
-    # List of months for the dropdown
+    st.markdown('<div class="zameen-card">', unsafe_allow_html=True)
+    card_header("📅", "Pakistan Crop Calendar", "Select a month to see recommended agricultural activities")
+
     months_list = [
-        "January", "February", "March", "April", "May", "June", 
+        "January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December"
     ]
-    
-    # Get current month to set as default index
+
     current_month_str = datetime.datetime.now().strftime("%B")
     default_index = months_list.index(current_month_str)
-    
-    # Expanded Calendar Data
+
     calendar_data = {
         "January": "🌾 **Wheat:** Apply second irrigation and urea. Prepare land for spring vegetables like gourds.",
         "February": "🥔 **Potato:** Harvesting begins. **Sugarcane:** Ideal time for spring planting.",
@@ -220,86 +537,86 @@ elif menu == "📅 Crop Calendar":
         "December": "🥦 **Vegetables:** Care for winter crops (Cabbage, Radish). **Wheat:** Apply first irrigation (Kor) 20-25 days after sowing."
     }
 
-    # Month Selection Dropdown
     selected_month = st.selectbox("Select Month:", months_list, index=default_index)
 
-    # Displaying the Result
-    st.markdown(f"---")
-    st.markdown(f"### 🗓️ Agricultural Activities for **{selected_month}**")
-    st.success(calendar_data.get(selected_month))
-    
-    # Highlight if it's the current month
+    st.markdown(f'<div class="month-badge">🗓️ {selected_month}</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="ai-result-box">{calendar_data.get(selected_month)}</div>', unsafe_allow_html=True)
+
     if selected_month == current_month_str:
-        st.info(f"✨ **Note:** This is the current month. Prioritize these tasks for your farm.")
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.info("✨ **Note:** This is the current month. Prioritize these tasks for your farm.")
+
+    st.markdown('</div>', unsafe_allow_html=True)
+
 # =============================
 # SMART ADVISORY (AI)
 # =============================
 elif menu == "🤖 Smart Advisory":
 
-    st.subheader("🤖 AI Farming Advisory")
+    st.markdown('<div class="zameen-card">', unsafe_allow_html=True)
+    card_header("🤖", "AI Farming Advisory", "Personalized advice based on crop, soil and season")
 
-    crop = st.text_input("Crop")
-    soil = st.selectbox("Soil Type", ["Sandy", "Clay", "Loamy"])
-    season = st.selectbox("Season", ["Summer", "Winter", "Monsoon", "Spring"])
+    c1, c2, c3 = st.columns(3)
+    with c1:
+        crop = st.text_input("Crop", placeholder="e.g. Wheat")
+    with c2:
+        soil = st.selectbox("Soil Type", ["Sandy", "Clay", "Loamy"])
+    with c3:
+        season = st.selectbox("Season", ["Summer", "Winter", "Monsoon", "Spring"])
 
-    if st.button("Generate Advisory"):
+    generate_btn = st.button("Generate Advisory", use_container_width=True)
+
+    if generate_btn:
         prompt = f"""
         Crop: {crop}
         Soil: {soil}
         Season: {season}
         Give farming advice.
         """
-        response = client.responses.create(
-            model="openai/gpt-oss-20b",
-            input=[
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": prompt}
-            ],
-            max_output_tokens=1000
-        )
-        st.write(response.output_text)
+        with st.spinner("Generating advisory..."):
+            response = client.responses.create(
+                model="openai/gpt-oss-20b",
+                input=[
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "user", "content": prompt}
+                ],
+                max_output_tokens=1000
+            )
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown(f'<div class="ai-result-box">{response.output_text}</div>', unsafe_allow_html=True)
 
- 
+    st.markdown('</div>', unsafe_allow_html=True)
+
+
 # =============================
 # CHATBOT (TEXT ONLY)
 # =============================
 elif menu == "💬 Chatbot":
- 
+
     st.markdown('<div class="zameen-card">', unsafe_allow_html=True)
-    st.markdown(
-        """
-        <div class="zameen-card-header">
-            <div class="zameen-icon-badge">💬</div>
-            <div class="titles">
-                <h3>Farming Assistant</h3>
-                <p>Ask anything about crops, soil, pests and more</p>
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
- 
+    card_header("💬", "Farming Assistant", "Ask anything about crops, soil, pests and more")
+
     if "messages" not in st.session_state:
         st.session_state.messages = []
- 
+
     # Show previous chat
     chat_box = st.container(height=420, border=False)
     with chat_box:
         for msg in st.session_state.messages:
             st.chat_message(msg["role"]).write(msg["content"])
- 
+
     # Text input
     user_input = st.chat_input("Ask a farming question...")
- 
+
     if user_input:
- 
+
         st.session_state.messages.append(
             {"role": "user", "content": user_input}
         )
- 
+
         with chat_box:
             st.chat_message("user").write(user_input)
- 
+
             with st.spinner("Thinking..."):
                 response = client.responses.create(
                     model="openai/gpt-oss-20b",
@@ -315,31 +632,33 @@ elif menu == "💬 Chatbot":
                     ],
                     max_output_tokens=1000
                 )
- 
+
             reply = response.output_text
- 
+
             st.session_state.messages.append(
                 {"role": "assistant", "content": reply}
             )
- 
+
             st.chat_message("assistant").write(reply)
     st.markdown('</div>', unsafe_allow_html=True)
+
 # =============================
 # DISEASE DETECTION (BYPASS 403)
 # =============================
 elif menu == "🦠 Disease Detection":
-    st.subheader("🦠 Crop Disease Detection")
-    st.write("Take a picture of crop or upload")
+
+    st.markdown('<div class="zameen-card">', unsafe_allow_html=True)
+    card_header("🦠", "Crop Disease Detection", "Take a picture of the crop leaf or upload one")
 
     # Form use karne se Axios error bypass ho jata hai
     with st.form("disease_form", clear_on_submit=True):
-        # Option 1: Mobile Camera (Best for farmers)
-        cam_image = st.camera_input("Take a photo of the leaf")
-        
-        # Option 2: File Upload (If camera not available)
-        file_image = st.file_uploader("Select File", type=["jpg", "jpeg", "png"])
-        
-        submit_button = st.form_submit_button("Check Disease")
+        col_a, col_b = st.columns(2)
+        with col_a:
+            cam_image = st.camera_input("Take a photo of the leaf")
+        with col_b:
+            file_image = st.file_uploader("Select File", type=["jpg", "jpeg", "png"])
+
+        submit_button = st.form_submit_button("Check Disease", use_container_width=True)
 
     # Image processing logic
     target_image = cam_image if cam_image is not None else file_image
@@ -348,11 +667,9 @@ elif menu == "🦠 Disease Detection":
         try:
             # Step 1: Image ko open aur compress karein
             img = Image.open(target_image)
-            
+
             # AI ke liye 1024px kafi hai, is se Axios crash nahi hota
             img.thumbnail((1024, 1024))
-            
-            # st.image(img, caption="Processing Image...", width=300)
 
             with st.spinner("Checking..."):
                 # prompt
@@ -365,15 +682,21 @@ elif menu == "🦠 Disease Detection":
                     4.Answer briefly in 200 words max.
                     If the plant is healthy, congratulate the farmer.
                     """
-                
+
                 # Gemini Client Call
                 response = gemini_client.models.generate_content(
                     model="gemini-2.5-flash",
                     contents=[prompt, img]
                 )
-                
-                st.success("✅ Analysis Result:")
-                st.markdown(response.text)
+
+                st.markdown("<br>", unsafe_allow_html=True)
+                col_img, col_res = st.columns([1, 2])
+                with col_img:
+                    st.image(img, caption="Analyzed Image", use_container_width=True)
+                with col_res:
+                    st.markdown(f'<div class="ai-result-box">✅ {response.text}</div>', unsafe_allow_html=True)
 
         except Exception as e:
             st.error(f"Error: {e}")
+
+    st.markdown('</div>', unsafe_allow_html=True)
