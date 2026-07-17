@@ -6,12 +6,8 @@ import datetime
 from openai import OpenAI
 from google import genai
 from PIL import Image
-from streamlit_mic_recorder import speech_to_text
 
-
-# =============================
 # CONFIG
-# =============================
 st.set_page_config(
     page_title="ZameenAI | Smart Farming",
     page_icon="🌾",
@@ -21,17 +17,14 @@ st.set_page_config(
 
 API_KEY = st.secrets["OPENWEATHER_API_KEY"]
 gemini_client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
-# =============================
+
 # GROQ CLIENT (ONLY 1 API)
-# =============================
 client = OpenAI(
     api_key=os.environ.get("GROQ_API_KEY"),
     base_url="https://api.groq.com/openai/v1"
 )
 
-# =============================
 # SYSTEM PROMPT (FARMING ONLY)
-# =============================
 SYSTEM_PROMPT = """
 You are ZameenAI, a friendly, professional, and intelligent AI farming assistant designed for farmers in Pakistan.
 
@@ -77,9 +70,7 @@ def is_farming_question(text):
     return any(word in text.lower() for word in FARMING_KEYWORDS)
 
 
-# =============================
-# GLOBAL THEME / CSS
-# =============================
+#CSS
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap');
@@ -416,9 +407,8 @@ def card_header(icon, title, subtitle):
     """, unsafe_allow_html=True)
 
 
-# =============================
+
 # HERO HEADER
-# =============================
 st.markdown("""
 <div class="zameen-hero">
     <div class="zameen-hero-left">
@@ -431,9 +421,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# =============================
 # MENU
-# =============================
 menu = st.radio(
     "Navigation Menu",
     ["🌦 Weather", "🦠 Disease Detection", "💬 Chatbot", "🤖 Smart Advisory",
@@ -442,13 +430,9 @@ menu = st.radio(
     label_visibility="collapsed"
 )
 
-# =============================
 # WEATHER
-# =============================
-
 if menu == "🌦 Weather":
 
-    st.markdown('<div class="zameen-card">', unsafe_allow_html=True)
     card_header("🌦", "Live Weather", "Check real-time weather for your area")
 
     col_in1, col_in2 = st.columns([3, 1])
@@ -483,12 +467,10 @@ if menu == "🌦 Weather":
 
     st.markdown('</div>', unsafe_allow_html=True)
 
-# =============================
+
 # CROP ESTIMATOR
-# =============================
 elif menu == "🌾 Crop Estimator":
 
-    st.markdown('<div class="zameen-card">', unsafe_allow_html=True)
     card_header("🌾", "Crop Cost & Yield Estimator", "Estimate cultivation cost and expected yield")
 
     crops = {
@@ -517,12 +499,9 @@ elif menu == "🌾 Crop Estimator":
 
     st.markdown('</div>', unsafe_allow_html=True)
 
-# =============================
 # MARKET & PROFIT
-# =============================
 elif menu == "📈 Market & Profit":
 
-    st.markdown('<div class="zameen-card">', unsafe_allow_html=True)
     card_header("📈", "Profit Predictor", "Forecast revenue and profit for your crop")
 
     prices = {
@@ -553,12 +532,10 @@ elif menu == "📈 Market & Profit":
 
     st.markdown('</div>', unsafe_allow_html=True)
 
-# =============================
+
 # FERTILIZER AI
-# =============================
 elif menu == "🧪 Fertilizer AI":
 
-    st.markdown('<div class="zameen-card">', unsafe_allow_html=True)
     card_header("🧪", "Fertilizer Recommendation", "Get the right fertilizer plan for your crop")
 
     c1, c2 = st.columns([3, 1])
@@ -579,12 +556,9 @@ elif menu == "🧪 Fertilizer AI":
 
     st.markdown('</div>', unsafe_allow_html=True)
 
-# =============================
 # CROP CALENDAR (WITH DROPDOWN)
-# =============================
 elif menu == "📅 Crop Calendar":
 
-    st.markdown('<div class="zameen-card">', unsafe_allow_html=True)
     card_header("📅", "Pakistan Crop Calendar", "Select a month to see recommended agricultural activities")
 
     months_list = [
@@ -621,12 +595,9 @@ elif menu == "📅 Crop Calendar":
 
     st.markdown('</div>', unsafe_allow_html=True)
 
-# =============================
 # SMART ADVISORY (AI)
-# =============================
-elif menu == "🤖 Smart Advisory":
 
-    st.markdown('<div class="zameen-card">', unsafe_allow_html=True)
+elif menu == "🤖 Smart Advisory":
     card_header("🤖", "AI Farming Advisory", "Personalized advice based on crop, soil and season")
 
     c1, c2, c3 = st.columns(3)
@@ -661,12 +632,9 @@ elif menu == "🤖 Smart Advisory":
     st.markdown('</div>', unsafe_allow_html=True)
 
 
-# =============================
-# CHATBOT (TEXT ONLY)
-# =============================
+# CHATBOT 
 elif menu == "💬 Chatbot":
 
-    st.markdown('<div class="zameen-card">', unsafe_allow_html=True)
     card_header("💬", "Farming Assistant", "Ask anything about crops, soil, pests and more")
 
     if "messages" not in st.session_state:
@@ -719,12 +687,12 @@ elif menu == "💬 Chatbot":
 
         st.rerun()
 
-# =============================
-# DISEASE DETECTION (BYPASS 403)
-# =============================
+
+# DISEASE DETECTION 
+
 elif menu == "🦠 Disease Detection":
 
-    st.markdown('<div class="zameen-card">', unsafe_allow_html=True)
+
     card_header("🦠", "Crop Disease Detection", "Take a picture of the crop leaf or upload one")
 
     # Form use karne se Axios error bypass ho jata hai
@@ -742,7 +710,7 @@ elif menu == "🦠 Disease Detection":
 
     if target_image is not None and submit_button:
         try:
-            # Step 1: Image ko open aur compress karein
+            #  Image  open/compress
             img = Image.open(target_image)
 
             # AI ke liye 1024px kafi hai, is se Axios crash nahi hota
