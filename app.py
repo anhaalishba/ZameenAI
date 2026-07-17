@@ -6,6 +6,7 @@ import datetime
 from openai import OpenAI
 from google import genai
 from PIL import Image
+from streamlit_mic_recorder import speech_to_text
 
 
 # =============================
@@ -314,6 +315,46 @@ label, .stMarkdown p { color: #cddad5 !important; }
     border: 1px solid #1f2b27 !important;
     border-radius: 14px !important;
 }
+
+/* Scrollable chat history box */
+div[data-testid="stVerticalBlockBorderWrapper"]:has([data-testid="stChatMessage"]) {
+    background: #0a0e0d;
+    border: 1px solid #1f2b27 !important;
+    border-radius: 14px !important;
+    padding: 6px 10px;
+}
+
+/* Chat input — pinned bar at bottom */
+[data-testid="stBottomBlockContainer"] {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0.6rem 1rem 1rem 1rem !important;
+    background: linear-gradient(180deg, rgba(8,9,10,0) 0%, #08090a 35%) !important;
+}
+[data-testid="stChatInput"] {
+    background: transparent !important;
+}
+[data-testid="stChatInput"] textarea {
+    background-color: #121b18 !important;
+    border: 1px solid #223530 !important;
+    color: #e7ece9 !important;
+    border-radius: 14px !important;
+}
+[data-testid="stChatInput"] textarea::placeholder {
+    color: #6f857e !important;
+}
+[data-testid="stChatInput"] textarea:focus {
+    border-color: #2dd4bf !important;
+    box-shadow: 0 0 0 1px #2dd4bf !important;
+}
+[data-testid="stChatInput"] button {
+    background: linear-gradient(135deg, #0f766e, #0d9488) !important;
+    border-radius: 10px !important;
+}
+[data-testid="stChatInput"] button svg { fill: #ffffff !important; }
+
+/* Leave room at the bottom of the page so the pinned chat input never overlaps content */
+.block-container { padding-bottom: 6.5rem; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -351,9 +392,6 @@ st.markdown("""
             <h1>ZameenAI</h1>
             <p>AI Powered Smart Farming Decision System</p>
         </div>
-    </div>
-    <div class="zameen-hero-right">
-        <span class="pulse-dot"></span> Live &nbsp;|&nbsp; Pakistan Edition
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -600,8 +638,15 @@ elif menu == "💬 Chatbot":
         st.session_state.messages = []
 
     # Show previous chat
-    chat_box = st.container(height=420, border=False)
+    chat_box = st.container(height=460, border=True)
     with chat_box:
+        if not st.session_state.messages:
+            st.markdown(
+                '<div style="color:#6f857e; text-align:center; padding:40px 10px;">'
+                '👋 Ask me anything about crops, soil, fertilizers, pests or weather.'
+                '</div>',
+                unsafe_allow_html=True
+            )
         for msg in st.session_state.messages:
             st.chat_message(msg["role"]).write(msg["content"])
 
@@ -647,7 +692,7 @@ elif menu == "💬 Chatbot":
 # =============================
 elif menu == "🦠 Disease Detection":
 
-    st.markdown('<div class="zameen-card">', unsafe_allow_html=True)
+  
     card_header("🦠", "Crop Disease Detection", "Take a picture of the crop leaf or upload one")
 
     # Form use karne se Axios error bypass ho jata hai
