@@ -79,6 +79,26 @@ CUSTOM_CSS = """
         font-size: 0.95rem;
     }
 
+    /* Collapse empty label wrappers (label_visibility="collapsed") so they
+       don't leave a blank box behind — this was the empty card under the nav */
+    div[data-testid="stWidgetLabel"]:has(label[data-visibility="collapsed"]) {
+        display: none !important;
+        height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    div[data-testid="stWidgetLabel"] label[style*="visibility: hidden"] {
+        display: none !important;
+    }
+    div[data-testid="stWidgetLabel"]:has(label[style*="visibility: hidden"]) {
+        height: 0 !important;
+        min-height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    /* Tighten the gap right under the nav pills */
+    div[role="radiogroup"] { margin-bottom: 0.2rem; }
+
     /* Radio menu styled as pill tabs */
     div[role="radiogroup"] {
         gap: 0.5rem;
@@ -259,6 +279,17 @@ CUSTOM_CSS = """
         font-size: 0.85rem;
     }
 
+    /* Mic icon button next to chat input — ChatGPT style */
+    div[data-testid="column"]:has(iframe[title*="mic_recorder"]),
+    div[data-testid="column"]:has(iframe[title*="streamlit_mic_recorder"]) {
+        display: flex;
+        align-items: flex-end;
+        padding-bottom: 0.35rem;
+    }
+    iframe[title*="mic_recorder"], iframe[title*="streamlit_mic_recorder"] {
+        border-radius: 50% !important;
+    }
+
     /* Divider */
     hr { border-color: var(--border-color) !important; }
 </style>
@@ -334,8 +365,6 @@ menu = st.radio(
     horizontal=True,
     label_visibility="collapsed"
 )
-
-st.write("")  # small spacer
 
 # =============================
 # WEATHER
@@ -662,21 +691,26 @@ elif menu == "💬 Chatbot":
         st.session_state.messages = []
 
     # Show previous chat
-    for msg in st.session_state.messages:
-        st.chat_message(msg["role"]).write(msg["content"])
+    chat_box = st.container(height=420, border=False)
+    with chat_box:
+        for msg in st.session_state.messages:
+            st.chat_message(msg["role"]).write(msg["content"])
 
-    st.markdown("##### 🎤 Speak or Type Your Question")
+    # Input row: text box + inline mic icon, ChatGPT-style
+    input_col, mic_col = st.columns([0.92, 0.08])
 
-    # Voice Input
-    voice_input = speech_to_text(
-        language="ur-PK",   # or "en-US"
-        use_container_width=True,
-        just_once=True,
-        key="voice"
-    )
+    with input_col:
+        typed_input = st.chat_input("Ask a farming question...")
 
-    # Text Input
-    typed_input = st.chat_input("Ask a farming question...")
+    with mic_col:
+        voice_input = speech_to_text(
+            language="ur-PK",   # or "en-US"
+            start_prompt="🎤",
+            stop_prompt="⏹️",
+            use_container_width=True,
+            just_once=True,
+            key="voice"
+        )
 
     # Use whichever input is available
     user_input = typed_input if typed_input else voice_input
@@ -687,31 +721,32 @@ elif menu == "💬 Chatbot":
             {"role": "user", "content": user_input}
         )
 
-        st.chat_message("user").write(user_input)
+        with chat_box:
+            st.chat_message("user").write(user_input)
 
-        with st.spinner("Thinking..."):
-            response = client.responses.create(
-                model="openai/gpt-oss-20b",
-                input=[
-                    {
-                        "role": "system",
-                        "content": SYSTEM_PROMPT
-                    },
-                    {
-                        "role": "user",
-                        "content": user_input
-                    }
-                ],
-                max_output_tokens=1000
+            with st.spinner("Thinking..."):
+                response = client.responses.create(
+                    model="openai/gpt-oss-20b",
+                    input=[
+                        {
+                            "role": "system",
+                            "content": SYSTEM_PROMPT
+                        },
+                        {
+                            "role": "user",
+                            "content": user_input
+                        }
+                    ],
+                    max_output_tokens=1000
+                )
+
+            reply = response.output_text
+
+            st.session_state.messages.append(
+                {"role": "assistant", "content": reply}
             )
 
-        reply = response.output_text
-
-        st.session_state.messages.append(
-            {"role": "assistant", "content": reply}
-        )
-
-        st.chat_message("assistant").write(reply)
+            st.chat_message("assistant").write(reply)
     st.markdown('</div>', unsafe_allow_html=True)
 
 # =============================
