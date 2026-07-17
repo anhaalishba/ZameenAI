@@ -161,6 +161,7 @@ html, body, [class*="css"] {
 div[data-testid="stRadio"] [data-testid="stWidgetLabel"] {
     display: none !important;
 }
+
 div[data-testid="stRadio"] div[role="radiogroup"] {
     display: flex;
     flex-wrap: wrap;
@@ -171,6 +172,25 @@ div[data-testid="stRadio"] div[role="radiogroup"] {
     border: 1px solid #1f2b27;
     margin-bottom: 22px;
 }
+
+/* Hide the actual radio input */
+div[data-testid="stRadio"] label input[type="radio"] {
+    display: none !important;
+}
+
+/* Hide the circle indicator (covers svg-based AND div-based BaseWeb versions) */
+div[data-testid="stRadio"] label > div:first-child,
+div[data-testid="stRadio"] label svg,
+div[data-testid="stRadio"] label > div:first-child > div {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    opacity: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Pill container itself = the label */
 div[data-testid="stRadio"] label {
     background: #161f1c;
     border: 1px solid #22302b;
@@ -182,18 +202,29 @@ div[data-testid="stRadio"] label {
     cursor: pointer;
     transition: all 0.2s ease;
     margin: 0 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0 !important;
 }
+
 div[data-testid="stRadio"] label:hover {
     border-color: #2dd4bf;
     color: #5eead4;
 }
+
 div[data-testid="stRadio"] label:has(input:checked) {
     background: linear-gradient(135deg, #0f766e, #115e59);
     border-color: #2dd4bf;
     color: #ffffff;
     box-shadow: 0 0 18px rgba(45,212,191,0.35);
 }
-div[data-testid="stRadio"] label > div:first-child { display: none; }
+
+/* Make sure text div takes full space, no leftover circle gap */
+div[data-testid="stRadio"] label > div {
+    margin: 0 !important;
+    padding: 0 !important;
+}
 
 /* ---------- Cards ---------- */
 .zameen-card {
