@@ -1,7 +1,7 @@
 ```markdown
-# 🌾 ZameenAI Ultra: AI-Powered Smart Farming System
+# 🌾 ZameenAI: AI-Powered Smart Farming System
 
-ZameenAI Ultra is a comprehensive precision agriculture ecosystem designed to empower farmers in Pakistan. By leveraging state-of-the-art Artificial Intelligence, it provides real-time solutions for disease detection, crop management, and market predictability.
+ZameenAI is a comprehensive precision agriculture ecosystem designed to empower farmers. By leveraging state-of-the-art Artificial Intelligence, it provides real-time solutions for disease detection, crop management, and market predictability.
 
 ---
 
