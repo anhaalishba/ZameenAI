@@ -259,66 +259,71 @@ elif menu == "🤖 Smart Advisory":
         )
         st.write(response.output_text)
 
+ 
 # =============================
-# CHATBOT (TEXT + VOICE)
+# CHATBOT (TEXT ONLY)
 # =============================
 elif menu == "💬 Chatbot":
-
-    st.subheader("💬🌾 Farming Assistant")
-
+ 
+    st.markdown('<div class="zameen-card">', unsafe_allow_html=True)
+    st.markdown(
+        """
+        <div class="zameen-card-header">
+            <div class="zameen-icon-badge">💬</div>
+            <div class="titles">
+                <h3>Farming Assistant</h3>
+                <p>Ask anything about crops, soil, pests and more</p>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+ 
     if "messages" not in st.session_state:
         st.session_state.messages = []
-
+ 
     # Show previous chat
-    for msg in st.session_state.messages:
-        st.chat_message(msg["role"]).write(msg["content"])
-
-    st.markdown("### 🎤 Speak or Type Your Question")
-
-    # Voice Input
-    voice_input = speech_to_text(
-        language="ur-PK",   # or "en-US"
-        use_container_width=True,
-        just_once=True,
-        key="voice"
-    )
-
-    # Text Input
-    typed_input = st.chat_input("Ask a farming question...")
-
-    # Use whichever input is available
-    user_input = typed_input if typed_input else voice_input
-
+    chat_box = st.container(height=420, border=False)
+    with chat_box:
+        for msg in st.session_state.messages:
+            st.chat_message(msg["role"]).write(msg["content"])
+ 
+    # Text input
+    user_input = st.chat_input("Ask a farming question...")
+ 
     if user_input:
-
+ 
         st.session_state.messages.append(
             {"role": "user", "content": user_input}
         )
-
-        st.chat_message("user").write(user_input)
-
-        response = client.responses.create(
-            model="openai/gpt-oss-20b",
-            input=[
-                {
-                    "role": "system",
-                    "content": SYSTEM_PROMPT
-                },
-                {
-                    "role": "user",
-                    "content": user_input
-                }
-            ],
-            max_output_tokens=1000
-        )
-
-        reply = response.output_text
-
-        st.session_state.messages.append(
-            {"role": "assistant", "content": reply}
-        )
-
-        st.chat_message("assistant").write(reply)
+ 
+        with chat_box:
+            st.chat_message("user").write(user_input)
+ 
+            with st.spinner("Thinking..."):
+                response = client.responses.create(
+                    model="openai/gpt-oss-20b",
+                    input=[
+                        {
+                            "role": "system",
+                            "content": SYSTEM_PROMPT
+                        },
+                        {
+                            "role": "user",
+                            "content": user_input
+                        }
+                    ],
+                    max_output_tokens=1000
+                )
+ 
+            reply = response.output_text
+ 
+            st.session_state.messages.append(
+                {"role": "assistant", "content": reply}
+            )
+ 
+            st.chat_message("assistant").write(reply)
+    st.markdown('</div>', unsafe_allow_html=True)
 # =============================
 # DISEASE DETECTION (BYPASS 403)
 # =============================
