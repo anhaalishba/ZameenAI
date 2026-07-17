@@ -6,8 +6,6 @@ import datetime
 from openai import OpenAI
 from google import genai
 from PIL import Image
-from streamlit_mic_recorder import speech_to_text
-
 
 # =============================
 # CONFIG
@@ -167,8 +165,10 @@ html, body, [class*="css"] {
 }
 
 /* ---------- Nav (radio as pill tabs) ---------- */
-div[data-testid="stRadio"] > label { display: none; }
-div[data-testid="stRadio"] > div {
+div[data-testid="stRadio"] [data-testid="stWidgetLabel"] {
+    display: none !important;
+}
+div[data-testid="stRadio"] div[role="radiogroup"] {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
@@ -188,6 +188,7 @@ div[data-testid="stRadio"] label {
     font-size: 14.5px;
     cursor: pointer;
     transition: all 0.2s ease;
+    margin: 0 !important;
 }
 div[data-testid="stRadio"] label:hover {
     border-color: #2dd4bf;
@@ -311,17 +312,49 @@ label, .stMarkdown p { color: #cddad5 !important; }
 /* ---------- Chat ---------- */
 .stChatMessage { background: transparent !important; }
 [data-testid="stChatMessageContent"] {
-    background: #0d1513 !important;
+    background: #121b18 !important;
     border: 1px solid #1f2b27 !important;
     border-radius: 14px !important;
 }
 
-/* Scrollable chat history box */
-div[data-testid="stVerticalBlockBorderWrapper"]:has([data-testid="stChatMessage"]) {
-    background: #0a0e0d;
+/* Scrollable chat history box (targeted via container key, works empty or full) */
+div.st-key-chat_history_box {
+    background: #0a0e0d !important;
     border: 1px solid #1f2b27 !important;
     border-radius: 14px !important;
-    padding: 6px 10px;
+    padding: 4px 10px !important;
+}
+div.st-key-chat_history_box [data-testid="stVerticalBlockBorderWrapper"] {
+    background: transparent !important;
+    border: none !important;
+}
+
+/* User messages: bubble on the right, teal fill */
+[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) {
+    flex-direction: row-reverse;
+}
+[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) [data-testid="stChatMessageContent"] {
+    background: linear-gradient(135deg, #0f766e, #0d9488) !important;
+    border: none !important;
+    color: #ffffff !important;
+}
+[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) [data-testid="stChatMessageContent"] p {
+    color: #ffffff !important;
+}
+
+/* Assistant messages: bubble on the left, dark fill */
+[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarAssistant"]) [data-testid="stChatMessageContent"] {
+    background: #121b18 !important;
+    border: 1px solid #223530 !important;
+}
+
+/* Avatars */
+[data-testid="stChatMessageAvatarUser"] {
+    background: linear-gradient(135deg, #0f766e, #0d9488) !important;
+}
+[data-testid="stChatMessageAvatarAssistant"] {
+    background: #1a2420 !important;
+    border: 1px solid #2dd4bf !important;
 }
 
 /* Chat input — pinned bar at bottom */
@@ -354,7 +387,7 @@ div[data-testid="stVerticalBlockBorderWrapper"]:has([data-testid="stChatMessage"
 [data-testid="stChatInput"] button svg { fill: #ffffff !important; }
 
 /* Leave room at the bottom of the page so the pinned chat input never overlaps content */
-.block-container { padding-bottom: 6.5rem; }
+.block-container { padding-bottom: 5.5rem; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -638,17 +671,19 @@ elif menu == "💬 Chatbot":
         st.session_state.messages = []
 
     # Show previous chat
-    chat_box = st.container(height=460, border=True)
+    chat_box = st.container(height=380, border=True, key="chat_history_box")
     with chat_box:
         if not st.session_state.messages:
             st.markdown(
-                '<div style="color:#6f857e; text-align:center; padding:40px 10px;">'
+                '<div style="display:flex; align-items:center; justify-content:center; '
+                'height:340px; color:#6f857e; text-align:center; padding:0 20px;">'
                 '👋 Ask me anything about crops, soil, fertilizers, pests or weather.'
                 '</div>',
                 unsafe_allow_html=True
             )
         for msg in st.session_state.messages:
-            st.chat_message(msg["role"]).write(msg["content"])
+            avatar = "🧑‍🌾" if msg["role"] == "user" else "🌾"
+            st.chat_message(msg["role"], avatar=avatar).write(msg["content"])
 
     # Text input
     user_input = st.chat_input("Ask a farming question...")
@@ -660,7 +695,7 @@ elif menu == "💬 Chatbot":
         )
 
         with chat_box:
-            st.chat_message("user").write(user_input)
+            st.chat_message("user", avatar="🧑‍🌾").write(user_input)
 
             with st.spinner("Thinking..."):
                 response = client.responses.create(
@@ -684,7 +719,7 @@ elif menu == "💬 Chatbot":
                 {"role": "assistant", "content": reply}
             )
 
-            st.chat_message("assistant").write(reply)
+            st.chat_message("assistant", avatar="🌾").write(reply)
     st.markdown('</div>', unsafe_allow_html=True)
 
 # =============================
@@ -692,7 +727,7 @@ elif menu == "💬 Chatbot":
 # =============================
 elif menu == "🦠 Disease Detection":
 
-  
+    st.markdown('<div class="zameen-card">', unsafe_allow_html=True)
     card_header("🦠", "Crop Disease Detection", "Take a picture of the crop leaf or upload one")
 
     # Form use karne se Axios error bypass ho jata hai
