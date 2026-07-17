@@ -6,6 +6,8 @@ import datetime
 from openai import OpenAI
 from google import genai
 from PIL import Image
+from streamlit_mic_recorder import speech_to_text
+
 
 # =============================
 # CONFIG
@@ -317,18 +319,6 @@ label, .stMarkdown p { color: #cddad5 !important; }
     border-radius: 14px !important;
 }
 
-/* Scrollable chat history box (targeted via container key, works empty or full) */
-div.st-key-chat_history_box {
-    background: #0a0e0d !important;
-    border: 1px solid #1f2b27 !important;
-    border-radius: 14px !important;
-    padding: 4px 10px !important;
-}
-div.st-key-chat_history_box [data-testid="stVerticalBlockBorderWrapper"] {
-    background: transparent !important;
-    border: none !important;
-}
-
 /* User messages: bubble on the right, teal fill */
 [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) {
     flex-direction: row-reverse;
@@ -357,37 +347,49 @@ div.st-key-chat_history_box [data-testid="stVerticalBlockBorderWrapper"] {
     border: 1px solid #2dd4bf !important;
 }
 
-/* Chat input — pinned bar at bottom */
+/* Chat input — pinned bar at bottom, compact + centered instead of full-width */
+[data-testid="stBottom"] {
+    background: linear-gradient(180deg, rgba(8,9,10,0) 0%, #08090a 45%) !important;
+}
 [data-testid="stBottomBlockContainer"] {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0.6rem 1rem 1rem 1rem !important;
-    background: linear-gradient(180deg, rgba(8,9,10,0) 0%, #08090a 35%) !important;
+    max-width: 760px !important;
+    margin: 0 auto !important;
+    padding: 0.5rem 1rem 1rem 1rem !important;
 }
 [data-testid="stChatInput"] {
     background: transparent !important;
 }
-[data-testid="stChatInput"] textarea {
+[data-testid="stChatInput"] > div {
     background-color: #121b18 !important;
     border: 1px solid #223530 !important;
+    border-radius: 24px !important;
+    padding: 2px 6px 2px 16px !important;
+    min-height: 0 !important;
+}
+[data-testid="stChatInput"] textarea {
+    background-color: transparent !important;
     color: #e7ece9 !important;
-    border-radius: 14px !important;
+    padding: 8px 0 !important;
+    min-height: 20px !important;
+    font-size: 14.5px !important;
 }
 [data-testid="stChatInput"] textarea::placeholder {
     color: #6f857e !important;
 }
-[data-testid="stChatInput"] textarea:focus {
+[data-testid="stChatInput"] > div:focus-within {
     border-color: #2dd4bf !important;
     box-shadow: 0 0 0 1px #2dd4bf !important;
 }
 [data-testid="stChatInput"] button {
     background: linear-gradient(135deg, #0f766e, #0d9488) !important;
-    border-radius: 10px !important;
+    border-radius: 50% !important;
+    width: 32px !important;
+    height: 32px !important;
 }
 [data-testid="stChatInput"] button svg { fill: #ffffff !important; }
 
 /* Leave room at the bottom of the page so the pinned chat input never overlaps content */
-.block-container { padding-bottom: 5.5rem; }
+.block-container { padding-bottom: 5rem; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -670,22 +672,21 @@ elif menu == "💬 Chatbot":
     if "messages" not in st.session_state:
         st.session_state.messages = []
 
-    # Show previous chat
-    chat_box = st.container(height=380, border=True, key="chat_history_box")
-    with chat_box:
-        if not st.session_state.messages:
-            st.markdown(
-                '<div style="display:flex; align-items:center; justify-content:center; '
-                'height:340px; color:#6f857e; text-align:center; padding:0 20px;">'
-                '👋 Ask me anything about crops, soil, fertilizers, pests or weather.'
-                '</div>',
-                unsafe_allow_html=True
-            )
-        for msg in st.session_state.messages:
-            avatar = "🧑‍🌾" if msg["role"] == "user" else "🌾"
-            st.chat_message(msg["role"], avatar=avatar).write(msg["content"])
+    if not st.session_state.messages:
+        st.markdown(
+            '<p style="color:#6f857e; padding:6px 2px 4px 2px;">'
+            '👋 Ask me anything about crops, soil, fertilizers, pests or weather.'
+            '</p>',
+            unsafe_allow_html=True
+        )
 
-    # Text input
+    for msg in st.session_state.messages:
+        avatar = "🧑‍🌾" if msg["role"] == "user" else "🌾"
+        st.chat_message(msg["role"], avatar=avatar).write(msg["content"])
+
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    # Text input (pinned to bottom of the page by Streamlit)
     user_input = st.chat_input("Ask a farming question...")
 
     if user_input:
@@ -694,33 +695,29 @@ elif menu == "💬 Chatbot":
             {"role": "user", "content": user_input}
         )
 
-        with chat_box:
-            st.chat_message("user", avatar="🧑‍🌾").write(user_input)
-
-            with st.spinner("Thinking..."):
-                response = client.responses.create(
-                    model="openai/gpt-oss-20b",
-                    input=[
-                        {
-                            "role": "system",
-                            "content": SYSTEM_PROMPT
-                        },
-                        {
-                            "role": "user",
-                            "content": user_input
-                        }
-                    ],
-                    max_output_tokens=1000
-                )
-
-            reply = response.output_text
-
-            st.session_state.messages.append(
-                {"role": "assistant", "content": reply}
+        with st.spinner("Thinking..."):
+            response = client.responses.create(
+                model="openai/gpt-oss-20b",
+                input=[
+                    {
+                        "role": "system",
+                        "content": SYSTEM_PROMPT
+                    },
+                    {
+                        "role": "user",
+                        "content": user_input
+                    }
+                ],
+                max_output_tokens=1000
             )
 
-            st.chat_message("assistant", avatar="🌾").write(reply)
-    st.markdown('</div>', unsafe_allow_html=True)
+        reply = response.output_text
+
+        st.session_state.messages.append(
+            {"role": "assistant", "content": reply}
+        )
+
+        st.rerun()
 
 # =============================
 # DISEASE DETECTION (BYPASS 403)
