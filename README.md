@@ -1,105 +1,313 @@
-```markdown
-# 🌾 ZameenAI: AI-Powered Smart Farming System
+# 🌾 ZameenAI
 
-ZameenAI is a comprehensive precision agriculture ecosystem designed to empower farmers. By leveraging state-of-the-art Artificial Intelligence, it provides real-time solutions for disease detection, crop management, and market predictability.
+> **AI-Powered Smart Farming Decision System for Pakistan**
 
----
-
-## 🚀 Key Features
-
-* **🦠 AI Disease Detection:** Powered by **Google Gemini 2.5 Flash Vision**. Farmers can upload or take a photo of a crop leaf to receive an instant diagnosis and treatment plan (Organic & Chemical).
-* **🤖 Smart Advisory & Chatbot:** A multilingual agricultural assistant powered by **Groq** to answer queries regarding soil health, fertilizers, and pest control.
-* **📅 Dynamic Crop Calendar:** A month-by-month guide for Rabi and Kharif crops, automatically synchronized with the current date.
-* **🌦 Live Weather Integration:** Real-time weather updates to help farmers plan irrigation and harvest schedules.
-* **📈 Market & Profit Predictor:** Tools to estimate crop yield and calculate potential revenue based on land area.
+![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python)
+![Streamlit](https://img.shields.io/badge/Streamlit-App-red?logo=streamlit)
+![Groq](https://img.shields.io/badge/Groq-LLM-green)
+![Gemini](https://img.shields.io/badge/Gemini-2.5%20Flash-orange)
+![License](https://img.shields.io/badge/License-MIT-brightgreen)
 
 ---
 
-## 🛠️ Tech Stack
+## 🌱 Overview
 
-* **Frontend:** [Streamlit](https://streamlit.io/)
-* **Vision AI:** [Google Gemini 2.5 Flash](https://ai.google.dev/) (Generative AI SDK)
-* **Language Model:** [openai/gpt-oss-120b](https://groq.com/) (via Groq Cloud)
-* **Image Processing:** PIL (Pillow)
-* **Language:** Python 3.10+
+**ZameenAI** is an AI-powered smart farming assistant built to help farmers make better agricultural decisions.
+
+The platform combines multiple AI technologies into a single application, allowing farmers to:
+
+- Detect crop diseases using AI Vision
+- Get personalized farming advice
+- Check live weather
+- Estimate crop yield and profit
+- Receive fertilizer recommendations
+- View Pakistan crop calendar
+- Chat with an AI farming assistant
+- Interact using voice and multiple languages
+
+Our goal is to make modern agricultural knowledge accessible to every farmer.
 
 ---
 
-## 📦 Installation & Setup
+# ✨ Features
 
-1. **Clone the repository:**
-   ```bash
-   git clone [https://github.com/anhaalishba/ZameenAI.git]
-   cd zameenai-ultra
+## 🌦 Live Weather
+
+- Real-time weather
+- Temperature
+- Humidity
+- Wind Speed
+- Weather Conditions
+
+---
+
+## 🦠 AI Disease Detection
+
+Upload or capture a crop image.
+
+AI automatically:
+
+- Detects disease
+- Explains the cause
+- Suggests organic remedies
+- Suggests chemical treatments
+
+Powered by **Google Gemini 2.5 Flash Vision**
+
+---
+
+## 💬 AI Farming Chatbot
+
+Ask any farming-related question.
+
+Supports:
+
+- English
+- Urdu
+- Sindhi
+
+Powered by **Groq GPT-OSS-20B**
+
+---
+
+## 🎤 Voice Support
+
+Farmers can interact using voice instead of typing.
+
+---
+
+## 🤖 Smart Advisory
+
+Provides personalized recommendations based on:
+
+- Crop
+- Soil Type
+- Season
+
+---
+
+## 🌾 Crop Yield Estimator
+
+Estimate:
+
+- Cost
+- Expected Yield
+
+---
+
+## 📈 Market & Profit Prediction
+
+Estimate:
+
+- Revenue
+- Profit
+
+---
+
+## 🧪 Fertilizer Recommendation
+
+AI recommends fertilizers according to crop type.
+
+---
+
+## 📅 Pakistan Crop Calendar
+
+Monthly agricultural activities for Pakistan.
+
+---
+
+# 🛠 Tech Stack
+
+| Technology | Usage |
+|------------|-------|
+| Python | Backend |
+| Streamlit | Frontend |
+| Groq GPT-OSS-20B | AI Chatbot |
+| Gemini 2.5 Flash | Disease Detection |
+| OpenWeather API | Live Weather |
+| Pillow | Image Processing |
+| Requests | API Calls |
+
+---
+
+# 📂 Project Structure
+
+```
+ZameenAI/
+
+│
+
+├── app.py
+
+├── requirements.txt
+
+├── README.md
+
+├── .streamlit/
+
+│   └── config.toml
 
 ```
 
-2. **Install dependencies:**
+---
+
+# 🚀 Installation
+
+Clone repository
+
+```bash
+git clone https://github.com/yourusername/ZameenAI.git
+
+cd ZameenAI
+```
+
+Install dependencies
+
 ```bash
 pip install -r requirements.txt
-
 ```
 
+Run
 
-3. **Set up Environment Variables:**
-Create a `.env` file or export your API keys:
-```env
-GEMINI_API_KEY=your_google_gemini_key
-GROQ_API_KEY=your_groq_api_key
-
-```
-
-
-4. **Run the App:**
 ```bash
-streamlit run streamlit_app.py
-
+streamlit run app.py
 ```
-
-
 
 ---
 
-## 📂 Project Structure
+# 🔑 Environment Variables
+
+## Streamlit Secrets
+
+Create
+
+```
+.streamlit/secrets.toml
+```
+
+Add
+
+```toml
+OPENWEATHER_API_KEY="YOUR_KEY"
+```
+
+Environment Variables
 
 ```text
-├── .streamlit/          # Streamlit configuration
-├──  streamlit_app.py # Main application code
-├── requirements.txt     # Python dependencies
-├── README.md            # Project documentation
+GROQ_API_KEY=YOUR_GROQ_KEY
 
-
+GEMINI_API_KEY=YOUR_GEMINI_KEY
 ```
 
 ---
 
-## 🌟 Why ZameenAI?
+# 🌍 Deployment
 
-Traditional farming in Pakistan suffers from an "Information Gap." **ZameenAI Ultra** bridges this gap by providing:
+Deploy easily on **Streamlit Community Cloud**
 
-1. **Speed:** Gemini 2.5 Flash ensures sub-second response times for image analysis disease detection.
-2. **Accuracy:** High-resolution vision models for early pest detection.
-3. **Accessibility:** A simple, mobile-first interface designed for rural users.
+1. Push project to GitHub
+
+2. Login to Streamlit Cloud
+
+3. Create New App
+
+4. Select repository
+
+5. Add Secrets
+
+```toml
+OPENWEATHER_API_KEY="..."
+
+```
+
+Environment Variables
+
+```
+GROQ_API_KEY
+
+GEMINI_API_KEY
+```
+
+6. Click **Deploy**
 
 ---
 
-## 🤝 Contributing
+# 📸 Screenshots
 
-Contributions are welcome! If you have suggestions for new features or crop data, feel free to open an issue or submit a pull request.
+## Home
 
-## 📄 License
+*(Add Screenshot Here)*
+
+---
+
+## Disease Detection
+
+*(Add Screenshot Here)*
+
+---
+
+## AI Chatbot
+
+*(Add Screenshot Here)*
+
+---
+
+## Weather
+
+*(Add Screenshot Here)*
+
+---
+
+# 🎥 Demo
+
+Demo Video
+
+> Add your YouTube or Drive link here.
+
+---
+
+# 🌍 Supported Languages
+
+- 🇬🇧 English
+- 🇵🇰 Urdu
+- 🌾 Sindhi
+
+---
+
+# 💡 Future Improvements
+
+- Satellite Crop Monitoring
+- AI Pest Prediction
+- Soil Analysis
+- Offline Mode
+- Mobile Application
+- Government Scheme Recommendations
+- Farmer Community
+- Voice Responses
+- Market Price Forecasting
+
+---
+
+# 👨‍💻 Team
+
+- Anha Alishba
+- Sayed Asad Murtiza
+
+---
+
+# ❤️ Acknowledgements
+
+- Google Gemini
+- Groq
+- OpenWeather
+- Streamlit
+
+---
+
+# 📜 License
 
 This project is licensed under the MIT License.
 
-```
-
 ---
 
-### 💡 Quick Tips for your GitHub:
-1.  **Add a Screenshot:** Inside the `assets/` folder, put a screenshot of your app's main page and name it `screenshot.png`. Then add `![App Screenshot](assets/screenshot.png)` at the top of the README.
-2.  **Add Tags:** On the right side of your GitHub repo, add tags like `#agriculture`, `#python`, `#gemini-2.5`, and `#streamlit` to help people find your project.
-3.  **Deployment Link:** Make sure to put your Streamlit Cloud link in the **"About"** section of the repository.
-
-**Would you like me to generate a "License" file for you as well? (MIT License is standard for projects like this).**
-
-```
+## ⭐ If you like this project, don't forget to star the repository!
