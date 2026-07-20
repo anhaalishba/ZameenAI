@@ -23,7 +23,7 @@ The platform combines multiple AI technologies into a single application, allowi
 - Receive fertilizer recommendations
 - View Pakistan crop calendar
 - Chat with an AI farming assistant
-- Interact using voice and multiple languages
+- Interact using multiple languages
 
 Our goal is to make modern agricultural knowledge accessible to every farmer.
 
@@ -70,11 +70,6 @@ Powered by **Groq GPT-OSS-20B**
 
 ---
 
-## 🎤 Voice Support
-
-Farmers can interact using voice instead of typing.
-
----
 
 ## 🤖 Smart Advisory
 
