@@ -456,7 +456,7 @@ st.markdown("""
 menu = st.radio(
     "Navigation Menu",
     ["🌦 Weather", "🦠 Disease Detection", "💬 Chatbot", "🤖 Smart Advisory",
-     "🌾 Crop Estimator", "🧪 Fertilizer AI", "📈 Market & Profit", "📅 Crop Calendar"],
+    "📈 Market & Profit", "📅 Crop Calendar"],
     horizontal=True,
     label_visibility="collapsed"
 )
@@ -499,37 +499,6 @@ if menu == "🌦 Weather":
     st.markdown('</div>', unsafe_allow_html=True)
 
 
-# CROP ESTIMATOR
-elif menu == "🌾 Crop Estimator":
-
-    card_header("🌾", "Crop Cost & Yield Estimator", "Estimate cultivation cost and expected yield")
-
-    crops = {
-        "Wheat": {"cost": 50000, "yield": 30},
-        "Rice": {"cost": 60000, "yield": 35},
-        "Maize": {"cost": 45000, "yield": 28},
-        "Sugarcane": {"cost": 80000, "yield": 60},
-        "Cotton": {"cost": 70000, "yield": 25}
-    }
-
-    c1, c2, c3 = st.columns([2, 2, 1])
-    with c1:
-        crop = st.selectbox("Select Crop", list(crops.keys()))
-    with c2:
-        area = st.number_input("Land Area (acres)", min_value=1)
-    with c3:
-        st.write("")
-        st.write("")
-        calc_btn = st.button("Calculate", use_container_width=True)
-
-    if calc_btn:
-        st.markdown("<br>", unsafe_allow_html=True)
-        m1, m2 = st.columns(2)
-        metric_card(m1, "💰", "Estimated Cost", f"Rs {crops[crop]['cost'] * area:,}")
-        metric_card(m2, "🌾", "Expected Yield", f"{crops[crop]['yield'] * area} maunds")
-
-    st.markdown('</div>', unsafe_allow_html=True)
-
 # MARKET & PROFIT
 elif menu == "📈 Market & Profit":
 
@@ -560,30 +529,6 @@ elif menu == "📈 Market & Profit":
         m1, m2 = st.columns(2)
         metric_card(m1, "💰", "Revenue", f"Rs {revenue:,}")
         metric_card(m2, "🏆", "Profit", f"Rs {revenue - cost:,}")
-
-    st.markdown('</div>', unsafe_allow_html=True)
-
-
-# FERTILIZER AI
-elif menu == "🧪 Fertilizer AI":
-
-    card_header("🧪", "Fertilizer Recommendation", "Get the right fertilizer plan for your crop")
-
-    c1, c2 = st.columns([3, 1])
-    with c1:
-        crop = st.text_input("Crop Name", label_visibility="collapsed", placeholder="Enter crop name (e.g. Wheat)")
-    with c2:
-        recommend_btn = st.button("Recommend", use_container_width=True)
-
-    if recommend_btn:
-        if crop.lower() == "wheat":
-            result = "Use Urea + DAP in split doses."
-        elif crop.lower() == "rice":
-            result = "Use NPK 20-20-20, maintain flooded field."
-        else:
-            result = "Use balanced NPK with organic compost."
-
-        st.markdown(f'<div class="ai-result-box">🧪 {result}</div>', unsafe_allow_html=True)
 
     st.markdown('</div>', unsafe_allow_html=True)
 
