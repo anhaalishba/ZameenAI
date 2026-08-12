@@ -443,8 +443,14 @@ def forecast_card(col, day_label, icon_url, temp, desc):
 def read_aloud_button(text, key, lang="en-US"):
     """Renders a small speaker button that reads the given text aloud
     using the browser's built-in Speech Synthesis (Text-to-Speech).
-    `lang` should be a BCP-47 code, e.g. 'en-US' for English or 'ur-PK' for Urdu,
-    so the browser picks a matching voice/pronunciation when available."""
+
+    `lang` should be a BCP-47 code, e.g. 'en-US' for English or 'ur-PK' for Urdu.
+
+    IMPORTANT for Urdu: just setting `.lang` on the utterance is NOT enough --
+    most browsers only actually speak correctly if we explicitly find and
+    attach a matching installed voice object. If the device has no Urdu voice
+    installed at all, the button will tell the user instead of failing silently.
+    """
     safe_text = json.dumps(text).replace("</script>", "<\\/script>")
     safe_lang = json.dumps(lang)
     html_code = f"""
@@ -467,25 +473,76 @@ def read_aloud_button(text, key, lang="en-US"):
             return;
         }}
 
-        btn.addEventListener("click", function() {{
+        function pickVoice() {{
+            var voices = window.speechSynthesis.getVoices();
+            var exact = voices.find(function(v) {{ return v.lang === langCode; }});
+            if (exact) return exact;
+            var langPrefix = langCode.split("-")[0].toLowerCase();
+            var partial = voices.find(function(v) {{ return v.lang.toLowerCase().indexOf(langPrefix) === 0; }});
+            return partial || null;
+        }}
+
+        function speakNow() {{
             if (window.speechSynthesis.speaking) {{
                 window.speechSynthesis.cancel();
                 btn.innerText = "🔊 Read Aloud";
                 return;
             }}
+
+            var voices = window.speechSynthesis.getVoices();
+            // Some browsers load voices asynchronously; if the list is empty,
+            // wait briefly for voiceschanged then try again.
+            if (voices.length === 0) {{
+                btn.innerText = "⏳ Loading voice...";
+                window.speechSynthesis.onvoiceschanged = function() {{
+                    speakNow();
+                }};
+                // Trigger a load in some browsers
+                window.speechSynthesis.getVoices();
+                return;
+            }}
+
+            var matchedVoice = pickVoice();
+            var langPrefix = langCode.split("-")[0].toLowerCase();
+
+            if (langPrefix === "ur" && !matchedVoice) {{
+                btn.innerText = "🔇 No Urdu voice on this device";
+                return;
+            }}
+
             var msg = new SpeechSynthesisUtterance(textToRead);
-            msg.rate = 0.95;
-            msg.lang = langCode;
+            msg.rate = 0.9;
+            msg.pitch = 1;
+            msg.lang = matchedVoice ? matchedVoice.lang : langCode;
+            if (matchedVoice) {{ msg.voice = matchedVoice; }}
             msg.onstart = function() {{ btn.innerText = "⏸ Stop"; }};
             msg.onend = function() {{ btn.innerText = "🔊 Read Aloud"; }};
             msg.onerror = function() {{ btn.innerText = "🔊 Read Aloud"; }};
             window.speechSynthesis.cancel();
             window.speechSynthesis.speak(msg);
-        }});
+        }}
+
+        btn.addEventListener("click", speakNow);
     }})();
     </script>
     """
     components.html(html_code, height=42)
+
+
+def split_bilingual(text):
+    """Splits a model response formatted with ###ENGLISH### / ###URDU###
+    markers into (english_part, urdu_part). Falls back gracefully if the
+    markers are missing so nothing ever crashes."""
+    english_part = text.strip()
+    urdu_part = ""
+    if "###URDU###" in text:
+        parts = text.split("###URDU###")
+        english_part = parts[0].replace("###ENGLISH###", "").strip()
+        urdu_part = parts[1].strip()
+    elif "###ENGLISH###" in text:
+        english_part = text.replace("###ENGLISH###", "").strip()
+    return english_part, urdu_part
+
 
 def card_header(icon, title, subtitle):
     st.markdown(f"""
@@ -690,13 +747,17 @@ elif menu == "🤖 Smart Advisory":
         Crop: {crop}
         Soil: {soil}
         Season: {season}
-  Give farming advice for this crop, soil and season.
- 
+
+        Give farming advice for this crop, soil and season.
+
         STRICT RULES:
-        - Reply ONLY in Two sections 1.Urdu and 2.English . 
-        - Maximum 1 to 2 short sentences. No more.
-        - Use very simple, everyday words that an ordinary farmer with no formal education can easily understand. Avoid technical or complex agricultural terms.
-        - Go straight to the practical advice, no greetings, no extra explanation.
+        - Respond in EXACTLY this format, with nothing else before or after it:
+
+        ###ENGLISH###
+        (1 to 2 short sentences, very simple everyday words, no technical terms, straight to the practical advice, no greetings)
+
+        ###URDU###
+        (The same advice written fully in Urdu script (اردو), also 1 to 2 short sentences, very simple everyday words a farmer with no formal education can understand, no greetings)
         """
         with st.spinner("Generating advisory..."):
             response = client.responses.create(
@@ -705,11 +766,31 @@ elif menu == "🤖 Smart Advisory":
                     {"role": "system", "content": SYSTEM_PROMPT},
                     {"role": "user", "content": prompt}
                 ],
-                max_output_tokens=1000
+                max_output_tokens=300
             )
+
+        english_part, urdu_part = split_bilingual(response.output_text)
+
         st.markdown("<br>", unsafe_allow_html=True)
-        st.markdown(f'<div class="ai-result-box">{response.output_text}</div>', unsafe_allow_html=True)
-        read_aloud_button(response.output_text, key="advisory_result")
+
+        st.markdown(
+            '<p style="color:#5eead4; font-weight:600; font-size:13px; margin-bottom:4px;">🇬🇧 English</p>',
+            unsafe_allow_html=True
+        )
+        st.markdown(f'<div class="ai-result-box">{english_part}</div>', unsafe_allow_html=True)
+        read_aloud_button(english_part, key="advisory_result_en", lang="en-US")
+
+        if urdu_part:
+            st.markdown("<br>", unsafe_allow_html=True)
+            st.markdown(
+                '<p style="color:#5eead4; font-weight:600; font-size:13px; margin-bottom:4px;">🇵🇰 اردو</p>',
+                unsafe_allow_html=True
+            )
+            st.markdown(
+                f'<div class="ai-result-box" style="direction:rtl; text-align:right; font-size:16px;">{urdu_part}</div>',
+                unsafe_allow_html=True
+            )
+            read_aloud_button(urdu_part, key="advisory_result_ur", lang="ur-PK")
 
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -837,13 +918,19 @@ elif menu == "🦠 Disease Detection":
             with st.spinner("Checking..."):
                 # prompt
                 prompt = """
-                    You are an expert plant pathologist for crops. 
-                    Analyze this image of a  plant. 
-                    1. Name the disease.
-                    2. Give a brief explanation of why it happened.
-                    3. Suggest organic (desi) and chemical remedies.
-                    4.Answer briefly in 400 words max(Two sections 1.English(200 words)and 2.Urdu(200words).
-                    If the plant is healthy, congratulate the farmer.
+                    You are an expert plant pathologist for Pakistan's crops.
+                    Analyze this image of a plant and respond in EXACTLY this format,
+                    with nothing else before or after it:
+
+                    ###ENGLISH###
+                    1. Disease name
+                    2. Brief reason why it happened
+                    3. Organic (desi) and chemical remedies
+                    (Keep this section under 150 words. If the plant is healthy, congratulate the farmer.)
+
+                    ###URDU###
+                    (Write the same information fully in Urdu script (اردو), under 150 words.
+                    Use simple, farmer-friendly Urdu. If healthy, congratulate the farmer in Urdu.)
                     """
 
                 # Gemini Client Call
@@ -852,13 +939,31 @@ elif menu == "🦠 Disease Detection":
                     contents=[prompt, img]
                 )
 
+                english_part, urdu_part = split_bilingual(response.text)
+
                 st.markdown("<br>", unsafe_allow_html=True)
                 col_img, col_res = st.columns([1, 2])
                 with col_img:
                     st.image(img, caption="Analyzed Image", use_container_width=True)
                 with col_res:
-                    st.markdown(f'<div class="ai-result-box">✅ {response.text}</div>', unsafe_allow_html=True)
-                    read_aloud_button(response.text, key="disease_result")
+                    st.markdown(
+                        '<p style="color:#5eead4; font-weight:600; font-size:13px; margin-bottom:4px;">🇬🇧 English</p>',
+                        unsafe_allow_html=True
+                    )
+                    st.markdown(f'<div class="ai-result-box">✅ {english_part}</div>', unsafe_allow_html=True)
+                    read_aloud_button(english_part, key="disease_result_en", lang="en-US")
+
+                    if urdu_part:
+                        st.markdown("<br>", unsafe_allow_html=True)
+                        st.markdown(
+                            '<p style="color:#5eead4; font-weight:600; font-size:13px; margin-bottom:4px;">🇵🇰 اردو</p>',
+                            unsafe_allow_html=True
+                        )
+                        st.markdown(
+                            f'<div class="ai-result-box" style="direction:rtl; text-align:right;">✅ {urdu_part}</div>',
+                            unsafe_allow_html=True
+                        )
+                        read_aloud_button(urdu_part, key="disease_result_ur", lang="ur-PK")
 
         except Exception as e:
             st.error(f"Error: {e}")
