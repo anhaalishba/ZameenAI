@@ -440,14 +440,13 @@ def forecast_card(col, day_label, icon_url, temp, desc):
     """, unsafe_allow_html=True)
 
 
-def read_aloud_button(text, key):
+def read_aloud_button(text, key, lang="en-US"):
     """Renders a small speaker button that reads the given text aloud
     using the browser's built-in Speech Synthesis (Text-to-Speech).
-    Works for Urdu/English text as long as the device has a matching voice."""
-    # Put the text inside a <script> block as a JS variable instead of an
-    # inline HTML attribute -- avoids quote-escaping conflicts (json.dumps
-    # produces double-quoted strings, which broke onclick="...").
+    `lang` should be a BCP-47 code, e.g. 'en-US' for English or 'ur-PK' for Urdu,
+    so the browser picks a matching voice/pronunciation when available."""
     safe_text = json.dumps(text).replace("</script>", "<\\/script>")
+    safe_lang = json.dumps(lang)
     html_code = f"""
     <div style="margin-top:4px; margin-bottom:2px;">
         <button id="btn-{key}"
@@ -459,6 +458,7 @@ def read_aloud_button(text, key):
     <script>
     (function() {{
         var textToRead = {safe_text};
+        var langCode = {safe_lang};
         var btn = document.getElementById("btn-{key}");
 
         if (!("speechSynthesis" in window)) {{
@@ -475,6 +475,7 @@ def read_aloud_button(text, key):
             }}
             var msg = new SpeechSynthesisUtterance(textToRead);
             msg.rate = 0.95;
+            msg.lang = langCode;
             msg.onstart = function() {{ btn.innerText = "⏸ Stop"; }};
             msg.onend = function() {{ btn.innerText = "🔊 Read Aloud"; }};
             msg.onerror = function() {{ btn.innerText = "🔊 Read Aloud"; }};
@@ -485,7 +486,6 @@ def read_aloud_button(text, key):
     </script>
     """
     components.html(html_code, height=42)
-
 
 def card_header(icon, title, subtitle):
     st.markdown(f"""
