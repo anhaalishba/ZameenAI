@@ -2,7 +2,10 @@ import streamlit as st
 import requests
 import os
 import base64
+import json
 import datetime
+import streamlit.components.v1 as components
+from streamlit_mic_recorder import mic_recorder
 from openai import OpenAI
 from google import genai
 from PIL import Image
@@ -437,6 +440,36 @@ def forecast_card(col, day_label, icon_url, temp, desc):
     """, unsafe_allow_html=True)
 
 
+def read_aloud_button(text, key):
+    """Renders a small speaker button that reads the given text aloud
+    using the browser's built-in Speech Synthesis (Text-to-Speech).
+    Works for Urdu/English text as long as the device has a matching voice."""
+    safe_text = json.dumps(text)  # safely escape quotes/newlines for JS
+    html_code = f"""
+    <div style="margin-top:4px; margin-bottom:2px;">
+        <button id="btn-{key}" onclick="
+            window.speechSynthesis.cancel();
+            var msg = new SpeechSynthesisUtterance({safe_text});
+            msg.rate = 0.95;
+            var btn = document.getElementById('btn-{key}');
+            msg.onstart = function() {{ btn.innerText = '⏸ Stop'; }};
+            msg.onend = function() {{ btn.innerText = '🔊 Read Aloud'; }};
+            if (window.speechSynthesis.speaking && btn.innerText === '⏸ Stop') {{
+                window.speechSynthesis.cancel();
+                btn.innerText = '🔊 Read Aloud';
+            }} else {{
+                window.speechSynthesis.speak(msg);
+            }}
+        "
+        style="background: linear-gradient(135deg, #0f766e, #0d9488); color:#fff; border:none;
+        border-radius:20px; padding:6px 16px; font-size:12.5px; font-weight:600; cursor:pointer;">
+        🔊 Read Aloud
+        </button>
+    </div>
+    """
+    components.html(html_code, height=42)
+
+
 def card_header(icon, title, subtitle):
     st.markdown(f"""
     <div class="zameen-card-header">
@@ -653,6 +686,7 @@ elif menu == "🤖 Smart Advisory":
             )
         st.markdown("<br>", unsafe_allow_html=True)
         st.markdown(f'<div class="ai-result-box">{response.output_text}</div>', unsafe_allow_html=True)
+        read_aloud_button(response.output_text, key="advisory_result")
 
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -665,22 +699,58 @@ elif menu == "💬 Chatbot":
     if "messages" not in st.session_state:
         st.session_state.messages = []
 
+    if "last_audio_id" not in st.session_state:
+        st.session_state.last_audio_id = None
+
     if not st.session_state.messages:
         st.markdown(
             '<p style="color:#6f857e; padding:6px 2px 4px 2px;">'
-            '👋 Ask me anything about crops, soil, fertilizers, pests or weather.'
+            '👋 Ask me anything about crops, soil, fertilizers, pests or weather. '
+            'Type it or use the 🎙️ mic button below.'
             '</p>',
             unsafe_allow_html=True
         )
 
-    for msg in st.session_state.messages:
+    for i, msg in enumerate(st.session_state.messages):
         avatar = "🧑‍🌾" if msg["role"] == "user" else "🌾"
         st.chat_message(msg["role"], avatar=avatar).write(msg["content"])
+        if msg["role"] == "assistant":
+            read_aloud_button(msg["content"], key=f"msg_{i}")
 
     st.markdown('</div>', unsafe_allow_html=True)
 
+    # ---- Voice input (mic -> Groq Whisper speech-to-text) ----
+    st.markdown(
+        '<p style="color:#8ea39c; font-size:12.5px; margin-bottom:2px;">🎙️ Tap to record your question:</p>',
+        unsafe_allow_html=True
+    )
+    audio = mic_recorder(
+        start_prompt="🎙️ Start Recording",
+        stop_prompt="⏹ Stop & Send",
+        just_once=False,
+        use_container_width=True,
+        format="wav",
+        key="voice_recorder"
+    )
+
+    voice_text = None
+    if audio and audio.get("id") != st.session_state.last_audio_id:
+        st.session_state.last_audio_id = audio["id"]
+        with st.spinner("Transcribing your voice..."):
+            try:
+                transcript = client.audio.transcriptions.create(
+                    model="whisper-large-v3",
+                    file=("voice.wav", audio["bytes"])
+                )
+                voice_text = transcript.text.strip()
+            except Exception as e:
+                st.error(f"Voice transcription failed: {e}")
+
     # Text input (pinned to bottom of the page by Streamlit)
-    user_input = st.chat_input("Ask a farming question...")
+    typed_input = st.chat_input("Ask a farming question...")
+
+    # Whichever input arrived (voice or typed) drives the same flow
+    user_input = voice_text if voice_text else typed_input
 
     if user_input:
 
@@ -765,6 +835,7 @@ elif menu == "🦠 Disease Detection":
                     st.image(img, caption="Analyzed Image", use_container_width=True)
                 with col_res:
                     st.markdown(f'<div class="ai-result-box">✅ {response.text}</div>', unsafe_allow_html=True)
+                    read_aloud_button(response.text, key="disease_result")
 
         except Exception as e:
             st.error(f"Error: {e}")
