@@ -444,28 +444,45 @@ def read_aloud_button(text, key):
     """Renders a small speaker button that reads the given text aloud
     using the browser's built-in Speech Synthesis (Text-to-Speech).
     Works for Urdu/English text as long as the device has a matching voice."""
-    safe_text = json.dumps(text)  # safely escape quotes/newlines for JS
+    # Put the text inside a <script> block as a JS variable instead of an
+    # inline HTML attribute -- avoids quote-escaping conflicts (json.dumps
+    # produces double-quoted strings, which broke onclick="...").
+    safe_text = json.dumps(text).replace("</script>", "<\\/script>")
     html_code = f"""
     <div style="margin-top:4px; margin-bottom:2px;">
-        <button id="btn-{key}" onclick="
-            window.speechSynthesis.cancel();
-            var msg = new SpeechSynthesisUtterance({safe_text});
-            msg.rate = 0.95;
-            var btn = document.getElementById('btn-{key}');
-            msg.onstart = function() {{ btn.innerText = '⏸ Stop'; }};
-            msg.onend = function() {{ btn.innerText = '🔊 Read Aloud'; }};
-            if (window.speechSynthesis.speaking && btn.innerText === '⏸ Stop') {{
-                window.speechSynthesis.cancel();
-                btn.innerText = '🔊 Read Aloud';
-            }} else {{
-                window.speechSynthesis.speak(msg);
-            }}
-        "
+        <button id="btn-{key}"
         style="background: linear-gradient(135deg, #0f766e, #0d9488); color:#fff; border:none;
         border-radius:20px; padding:6px 16px; font-size:12.5px; font-weight:600; cursor:pointer;">
         🔊 Read Aloud
         </button>
     </div>
+    <script>
+    (function() {{
+        var textToRead = {safe_text};
+        var btn = document.getElementById("btn-{key}");
+
+        if (!("speechSynthesis" in window)) {{
+            btn.innerText = "🔇 Not supported";
+            btn.disabled = true;
+            return;
+        }}
+
+        btn.addEventListener("click", function() {{
+            if (window.speechSynthesis.speaking) {{
+                window.speechSynthesis.cancel();
+                btn.innerText = "🔊 Read Aloud";
+                return;
+            }}
+            var msg = new SpeechSynthesisUtterance(textToRead);
+            msg.rate = 0.95;
+            msg.onstart = function() {{ btn.innerText = "⏸ Stop"; }};
+            msg.onend = function() {{ btn.innerText = "🔊 Read Aloud"; }};
+            msg.onerror = function() {{ btn.innerText = "🔊 Read Aloud"; }};
+            window.speechSynthesis.cancel();
+            window.speechSynthesis.speak(msg);
+        }});
+    }})();
+    </script>
     """
     components.html(html_code, height=42)
 
