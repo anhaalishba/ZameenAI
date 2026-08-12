@@ -690,7 +690,13 @@ elif menu == "🤖 Smart Advisory":
         Crop: {crop}
         Soil: {soil}
         Season: {season}
-        Give farming advice.
+  Give farming advice for this crop, soil and season.
+ 
+        STRICT RULES:
+        - Reply ONLY in Two sections 1.Urdu and 2.English . 
+        - Maximum 1 to 2 short sentences. No more.
+        - Use very simple, everyday words that an ordinary farmer with no formal education can easily understand. Avoid technical or complex agricultural terms.
+        - Go straight to the practical advice, no greetings, no extra explanation.
         """
         with st.spinner("Generating advisory..."):
             response = client.responses.create(
@@ -831,12 +837,12 @@ elif menu == "🦠 Disease Detection":
             with st.spinner("Checking..."):
                 # prompt
                 prompt = """
-                    You are an expert plant pathologist for Pakistan's crops. 
+                    You are an expert plant pathologist for crops. 
                     Analyze this image of a  plant. 
                     1. Name the disease.
                     2. Give a brief explanation of why it happened.
                     3. Suggest organic (desi) and chemical remedies.
-                    4.Answer briefly in 200 words max.
+                    4.Answer briefly in 400 words max(Two sections 1.English(200 words)and 2.Urdu(200words).
                     If the plant is healthy, congratulate the farmer.
                     """
 
