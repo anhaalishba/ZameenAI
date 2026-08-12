@@ -426,6 +426,17 @@ def metric_card(col, icon, label, value):
     """, unsafe_allow_html=True)
 
 
+def forecast_card(col, day_label, icon_url, temp, desc):
+    col.markdown(f"""
+    <div class="metric-box">
+        <img src="{icon_url}" width="45" style="margin-bottom:4px;">
+        <div class="metric-label">{day_label}</div>
+        <div class="metric-value">{temp}°C</div>
+        <div style="color:#8ea39c; font-size:12px; margin-top:2px;">{desc}</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+
 def card_header(icon, title, subtitle):
     st.markdown(f"""
     <div class="zameen-card-header">
@@ -474,8 +485,8 @@ if menu == "🌦 Weather":
 
     if get_weather:
 
+        # ---- Current Weather ----
         url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={API_KEY}&units=metric"
-
         response = requests.get(url)
         data = response.json()
 
@@ -492,6 +503,44 @@ if menu == "🌦 Weather":
             metric_card(m2, "💨", "Wind Speed", f"{wind} m/s")
             metric_card(m3, "💧", "Humidity", f"{humidity}%")
             metric_card(m4, "🌥", "Condition", description.title())
+
+            # ---- 5-Day Forecast (OpenWeather free tier = 3-hour steps) ----
+            forecast_url = f"https://api.openweathermap.org/data/2.5/forecast?q={city}&appid={API_KEY}&units=metric"
+            forecast_response = requests.get(forecast_url)
+            forecast_data = forecast_response.json()
+
+            if forecast_data.get("cod") == "200":
+
+                daily_data = {}
+                for entry in forecast_data["list"]:
+                    date_str, time_str = entry["dt_txt"].split(" ")
+                    # Prefer the ~12:00 PM slot as the representative reading for the day
+                    if date_str not in daily_data or time_str == "12:00:00":
+                        daily_data[date_str] = entry
+
+                # Drop today, keep next 5 days
+                today_str = datetime.datetime.now().strftime("%Y-%m-%d")
+                forecast_days = [d for d in daily_data.keys() if d != today_str][:5]
+
+                if forecast_days:
+                    st.markdown("<br>", unsafe_allow_html=True)
+                    st.markdown(
+                        '<div class="month-badge">📅 5-Day Forecast</div>',
+                        unsafe_allow_html=True
+                    )
+                    st.markdown("<br>", unsafe_allow_html=True)
+
+                    cols = st.columns(len(forecast_days))
+                    for i, day in enumerate(forecast_days):
+                        entry = daily_data[day]
+                        day_temp = entry["main"]["temp"]
+                        day_desc = entry["weather"][0]["description"].title()
+                        icon_code = entry["weather"][0]["icon"]
+                        icon_url = f"https://openweathermap.org/img/wn/{icon_code}@2x.png"
+
+                        day_name = datetime.datetime.strptime(day, "%Y-%m-%d").strftime("%a %d %b")
+
+                        forecast_card(cols[i], day_name, icon_url, round(day_temp), day_desc)
 
         else:
             st.error("City not found")
