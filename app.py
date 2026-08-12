@@ -760,37 +760,57 @@ elif menu == "🤖 Smart Advisory":
         (The same advice written fully in Urdu script (اردو), also 1 to 2 short sentences, very simple everyday words a farmer with no formal education can understand, no greetings)
         """
         with st.spinner("Generating advisory..."):
-            response = client.responses.create(
-                model="openai/gpt-oss-20b",
-                input=[
-                    {"role": "system", "content": SYSTEM_PROMPT},
-                    {"role": "user", "content": prompt}
-                ],
-                max_output_tokens=300
-            )
+            try:
+                try:
+                    response = client.responses.create(
+                        model="openai/gpt-oss-20b",
+                        input=[
+                            {"role": "system", "content": SYSTEM_PROMPT},
+                            {"role": "user", "content": prompt}
+                        ],
+                        max_output_tokens=800,
+                        reasoning_effort="low"
+                    )
+                except Exception:
+                    # Some deployments may not accept reasoning_effort -- retry without it
+                    response = client.responses.create(
+                        model="openai/gpt-oss-20b",
+                        input=[
+                            {"role": "system", "content": SYSTEM_PROMPT},
+                            {"role": "user", "content": prompt}
+                        ],
+                        max_output_tokens=800
+                    )
+                raw_output = (response.output_text or "").strip()
+            except Exception as e:
+                st.error(f"Advisory generation failed: {e}")
+                raw_output = ""
 
-        english_part, urdu_part = split_bilingual(response.output_text)
+        english_part, urdu_part = split_bilingual(raw_output)
 
         st.markdown("<br>", unsafe_allow_html=True)
 
-        st.markdown(
-            '<p style="color:#5eead4; font-weight:600; font-size:13px; margin-bottom:4px;">🇬🇧 English</p>',
-            unsafe_allow_html=True
-        )
-        st.markdown(f'<div class="ai-result-box">{english_part}</div>', unsafe_allow_html=True)
-        read_aloud_button(english_part, key="advisory_result_en", lang="en-US")
+        if not english_part and not urdu_part:
+            st.warning("⚠️ AI ka jawab khali aaya. Dobara 'Generate Advisory' dabayein.")
+        else:
+            st.markdown(
+                '<p style="color:#5eead4; font-weight:600; font-size:13px; margin-bottom:4px;">🇬🇧 English</p>',
+                unsafe_allow_html=True
+            )
+            st.markdown(f'<div class="ai-result-box">{english_part}</div>', unsafe_allow_html=True)
+            read_aloud_button(english_part, key="advisory_result_en", lang="en-US")
 
-        if urdu_part:
-            st.markdown("<br>", unsafe_allow_html=True)
-            st.markdown(
-                '<p style="color:#5eead4; font-weight:600; font-size:13px; margin-bottom:4px;">🇵🇰 اردو</p>',
-                unsafe_allow_html=True
-            )
-            st.markdown(
-                f'<div class="ai-result-box" style="direction:rtl; text-align:right; font-size:16px;">{urdu_part}</div>',
-                unsafe_allow_html=True
-            )
-            read_aloud_button(urdu_part, key="advisory_result_ur", lang="ur-PK")
+            if urdu_part:
+                st.markdown("<br>", unsafe_allow_html=True)
+                st.markdown(
+                    '<p style="color:#5eead4; font-weight:600; font-size:13px; margin-bottom:4px;">🇵🇰 اردو</p>',
+                    unsafe_allow_html=True
+                )
+                st.markdown(
+                    f'<div class="ai-result-box" style="direction:rtl; text-align:right; font-size:16px;">{urdu_part}</div>',
+                    unsafe_allow_html=True
+                )
+                read_aloud_button(urdu_part, key="advisory_result_ur", lang="ur-PK")
 
     st.markdown('</div>', unsafe_allow_html=True)
 
