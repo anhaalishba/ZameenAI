@@ -1,308 +1,571 @@
+````markdown
 # 🌾 ZameenAI
 
-> **AI-Powered Smart Farming Decision System for Pakistan**
+> **AI-Powered Smart Farming Decision System for Pakistan 🇵🇰**
 
-![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python)
-![Streamlit](https://img.shields.io/badge/Streamlit-App-red?logo=streamlit)
-![Groq](https://img.shields.io/badge/Groq-LLM-green)
-![Gemini](https://img.shields.io/badge/Gemini-2.5%20Flash-orange)
-![License](https://img.shields.io/badge/License-MIT-brightgreen)
+<p align="center">
+
+![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)
+![Streamlit](https://img.shields.io/badge/Streamlit-App-FF4B4B?logo=streamlit&logoColor=white)
+![Groq](https://img.shields.io/badge/Groq-GPT--OSS--20B-orange)
+![Gemini](https://img.shields.io/badge/Gemini-2.5%20Flash-4285F4?logo=google&logoColor=white)
+![OpenWeather](https://img.shields.io/badge/OpenWeather-API-FFB300)
+![Whisper](https://img.shields.io/badge/Whisper-Large%20V3-8A2BE2)
+![License](https://img.shields.io/badge/License-MIT-green)
+
+</p>
 
 ---
 
-## 🌱 Overview
+## 🌱 About ZameenAI
 
-**ZameenAI** is an AI-powered smart farming assistant built to help farmers make better agricultural decisions.
+**ZameenAI** is a multimodal AI-powered smart farming system designed especially for farmers in Pakistan.
 
-The platform combines multiple AI technologies into a single application, allowing farmers to:
+It brings multiple agricultural tools into a single, simple and farmer-friendly platform.
 
-- Detect crop diseases using AI Vision
-- Get personalized farming advice
-- Check live weather
-- Estimate crop yield and profit
-- Receive fertilizer recommendations
-- View Pakistan crop calendar
-- Chat with an AI farming assistant
-- Interact using multiple languages
+From **crop disease detection** and **AI farming advice** to **live weather**, **voice interaction**, **profit estimation**, and a **Pakistan crop calendar**, ZameenAI helps farmers make smarter agricultural decisions.
 
-Our goal is to make modern agricultural knowledge accessible to every farmer.
+> 🌾 **Our vision is simple:**
+> Make modern agricultural knowledge more accessible to every farmer.
 
 ---
 
 # ✨ Features
 
-## 🌦 Live Weather
+### 🌦️ Live Weather
 
-- Real-time weather
-- Temperature
-- Humidity
-- Wind Speed
-- Weather Conditions
+Get real-time weather information for any city.
 
----
+**Provides:**
 
-## 🦠 AI Disease Detection
+- 🌡️ Temperature
+- 💧 Humidity
+- 💨 Wind Speed
+- 🌥️ Weather Condition
+- 📅 5-Day Forecast
 
-Upload or capture a crop image.
-
-AI automatically:
-
-- Detects disease
-- Explains the cause
-- Suggests organic remedies
-- Suggests chemical treatments
-
-Powered by **Google Gemini 2.5 Flash Vision**
+Powered by **OpenWeather API**.
 
 ---
 
-## 💬 AI Farming Chatbot
+### 🦠 AI Crop Disease Detection
 
-Ask any farming-related question.
+Farmers can either capture a crop leaf using the camera or upload an image.
 
-Supports:
+The AI analyzes the image and provides:
 
-- English
-- Urdu
-- Sindhi
+- 🔍 Possible disease identification
+- 📖 Explanation of the possible cause
+- 🌿 Organic remedies
+- 🧪 Chemical treatment suggestions
+- ❤️ Healthy plant feedback
 
-Powered by **Groq GPT-OSS-20B**
+Powered by **Google Gemini 2.5 Flash**.
 
----
-
-
-## 🤖 Smart Advisory
-
-Provides personalized recommendations based on:
-
-- Crop
-- Soil Type
-- Season
+> ⚠️ Disease detection is AI-assisted and should be verified by a qualified agricultural expert for critical decisions.
 
 ---
 
-## 🌾 Crop Yield Estimator
+### 💬 AI Farming Chatbot
 
-Estimate:
+Ask farming questions naturally and get AI-powered answers.
 
-- Cost
-- Expected Yield
+Example:
 
----
+> *"When should I irrigate wheat?"*
 
-## 📈 Market & Profit Prediction
+The chatbot focuses specifically on:
 
-Estimate:
+- 🌾 Crops
+- 🌱 Soil
+- 💧 Irrigation
+- 🧪 Fertilizers
+- 🐛 Pests
+- 🦠 Plant Diseases
+- 🌦️ Agricultural Weather
+- 🚜 Farm Management
 
-- Revenue
-- Profit
-
----
-
-## 🧪 Fertilizer Recommendation
-
-AI recommends fertilizers according to crop type.
-
----
-
-## 📅 Pakistan Crop Calendar
-
-Monthly agricultural activities for Pakistan.
+Powered by **GPT-OSS-20B through Groq**.
 
 ---
 
-# 🛠 Tech Stack
+### 🎙️ Voice Farming Assistant
 
-| Technology | Usage |
-|------------|-------|
-| Python | Backend |
-| Streamlit | Frontend |
-| Groq GPT-OSS-20B | AI Chatbot |
-| Gemini 2.5 Flash | Disease Detection |
-| OpenWeather API | Live Weather |
-| Pillow | Image Processing |
-| Requests | API Calls |
+Farmers don't always need to type.
+
+ZameenAI supports voice-based questions:
+
+```text
+🎙️ Farmer speaks
+       ↓
+📝 Whisper Large V3
+       ↓
+💬 Text Question
+       ↓
+🤖 GPT-OSS-20B
+       ↓
+🌾 Farming Advice
+````
+
+Powered by **Whisper Large V3**.
+
+---
+
+### 🔊 Read Aloud
+
+AI responses can also be spoken aloud using the browser's built-in **Speech Synthesis** capability.
+
+This makes the application more accessible for users who prefer listening instead of reading.
+
+---
+
+### 🤖 Smart Farming Advisory
+
+Get personalized farming advice based on:
+
+* 🌾 Crop
+* 🌱 Soil Type
+* 🌤️ Season
+
+Example:
+
+```text
+Crop: Wheat
+Soil: Loamy
+Season: Winter
+```
+
+The AI generates short, practical and farmer-friendly recommendations.
+
+---
+
+### 📈 Market & Profit Predictor
+
+Estimate the financial outcome of a crop based on:
+
+* 🌾 Crop
+* 📐 Land Area
+* 💰 Estimated Revenue
+* 💸 Estimated Cost
+* 🏆 Estimated Profit
+
+The current prototype uses predefined crop prices and basic calculations.
+
+> 🚀 Future versions can integrate real-time agricultural market prices.
+
+---
+
+### 📅 Pakistan Crop Calendar
+
+Get month-wise agricultural activities for Pakistan.
+
+Includes guidance related to crops such as:
+
+* 🌾 Wheat
+* 🍚 Rice
+* 🌽 Maize
+* 🎋 Sugarcane
+* 🧵 Cotton
+* 🥔 Potato
+* 🌻 Sunflower
+* 🌱 Pulses
+* 🥬 Vegetables
+* 🌿 Oilseeds
+
+The calendar helps farmers understand what agricultural activities are important during each month.
+
+---
+
+# 🧠 AI Capabilities
+
+ZameenAI combines multiple AI technologies:
+
+| AI Technology                           | Purpose                          |
+| --------------------------------------- | -------------------------------- |
+| 🤖 **LLM**                              | Farming chatbot & smart advisory |
+| 👁️ **Computer Vision / Multimodal AI** | Crop disease analysis            |
+| 🎙️ **Speech Recognition**              | Voice-to-text farming questions  |
+| 🔊 **Speech Synthesis**                 | Read AI responses aloud          |
+| 🌦️ **External APIs**                   | Real-time weather information    |
+| 📅 **Rule-Based Logic**                 | Crop calendar                    |
+| 📊 **Calculations**                     | Revenue & profit estimation      |
+
+---
+
+# 🛠️ Tech Stack
+
+| Technology               | Usage                      |
+| ------------------------ | -------------------------- |
+| 🐍 **Python**            | Main programming language  |
+| 🎨 **Streamlit**         | Web application & UI       |
+| 🤖 **GPT-OSS-20B**       | Farming chatbot & advisory |
+| ⚡ **Groq API**           | Fast LLM inference         |
+| 👁️ **Gemini 2.5 Flash** | Crop image analysis        |
+| 🎙️ **Whisper Large V3** | Speech-to-text             |
+| 🌦️ **OpenWeather API**  | Live weather & forecast    |
+| 🖼️ **Pillow**           | Image processing           |
+| 🌐 **Requests**          | API communication          |
+| 🔊 **Web Speech API**    | Read Aloud                 |
+
+---
+
+# 🔗 LangChain & RAG
+
+> **Current version:** ZameenAI does **not currently use LangChain or RAG**.
+
+The current system directly communicates with the required AI APIs.
+
+### 🚀 Planned RAG Architecture
+
+A future version can introduce **Retrieval-Augmented Generation (RAG)** using verified agricultural knowledge.
+
+```text
+                 👨‍🌾 Farmer Question
+                         ↓
+                 🔎 RAG Retriever
+                         ↓
+              📚 Agricultural Knowledge
+                         ↓
+                 📄 Relevant Documents
+                         ↓
+                    🤖 LLM
+                         ↓
+              🌾 Farmer-Friendly Answer
+```
+
+Potential knowledge sources could include:
+
+* 🇵🇰 Pakistan agricultural guidelines
+* 🌾 Crop management documents
+* 🦠 Disease manuals
+* 🧪 Fertilizer recommendations
+* 🏛️ Government agriculture resources
+* 📚 Verified agricultural research
+
+**LangChain** could later be used to manage the retrieval pipeline, tools and multi-step AI workflows.
+
+---
+
+# 🏗️ System Architecture
+
+```text
+                         👨‍🌾 FARMER
+                             │
+                             ▼
+                    ┌─────────────────┐
+                    │    ZameenAI     │
+                    │    Streamlit    │
+                    └────────┬────────┘
+                             │
+          ┌──────────────────┼──────────────────┐
+          │                  │                  │
+          ▼                  ▼                  ▼
+      🌦 Weather          💬 Chatbot        🦠 Disease
+          │                  │                  │
+          ▼                  ▼                  ▼
+    OpenWeather          Groq API           Gemini
+                            │
+                            ▼
+                       GPT-OSS-20B
+
+          ┌──────────────────┼──────────────────┐
+          │                  │
+          ▼                  ▼
+      🎙️ Voice          📅 Calendar
+          │                  │
+          ▼                  ▼
+       Whisper          Rule-Based
+```
 
 ---
 
 # 📂 Project Structure
 
-```
+```text
 ZameenAI/
-
 │
-
 ├── app.py
-
 ├── requirements.txt
-
 ├── README.md
-
+│
 ├── .streamlit/
-
-│   └── config.toml
-
+│   └── secrets.toml
+│
+└── assets/
+    └── images/
 ```
 
 ---
 
-# 🚀 Installation
+# 🚀 Getting Started
 
-Clone repository
+## 1️⃣ Clone the Repository
 
 ```bash
 git clone https://github.com/yourusername/ZameenAI.git
-
 cd ZameenAI
 ```
 
-Install dependencies
+---
+
+## 2️⃣ Create Virtual Environment
+
+### Windows
+
+```bash
+python -m venv venv
+venv\Scripts\activate
+```
+
+### Linux / macOS
+
+```bash
+python -m venv venv
+source venv/bin/activate
+```
+
+---
+
+## 3️⃣ Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Run
+---
+
+# 🔐 API Configuration
+
+Create:
+
+```text
+.streamlit/secrets.toml
+```
+
+Add your OpenWeather API key:
+
+```toml
+OPENWEATHER_API_KEY = "YOUR_OPENWEATHER_API_KEY"
+```
+
+Set the following environment variables:
+
+```text
+GROQ_API_KEY=YOUR_GROQ_API_KEY
+GEMINI_API_KEY=YOUR_GEMINI_API_KEY
+```
+
+> 🔒 Never commit API keys or secrets to GitHub.
+
+---
+
+# ▶️ Run the Application
 
 ```bash
 streamlit run app.py
 ```
 
----
-
-# 🔑 Environment Variables
-
-## Streamlit Secrets
-
-Create
-
-```
-.streamlit/secrets.toml
-```
-
-Add
-
-```toml
-OPENWEATHER_API_KEY="YOUR_KEY"
-```
-
-Environment Variables
-
-```text
-GROQ_API_KEY=YOUR_GROQ_KEY
-
-GEMINI_API_KEY=YOUR_GEMINI_KEY
-```
-
----
-
-# 🌍 Deployment
-
-Deploy easily on **Streamlit Community Cloud**
-
-1. Push project to GitHub
-
-2. Login to Streamlit Cloud
-
-3. Create New App
-
-4. Select repository
-
-5. Add Secrets
-
-```toml
-OPENWEATHER_API_KEY="..."
-
-```
-
-Environment Variables
-
-```
-GROQ_API_KEY
-
-GEMINI_API_KEY
-```
-
-6. Click **Deploy**
-
----
-
-# 📸 Screenshots
-
-## Home
-
-*(Add Screenshot Here)*
-
----
-
-## Disease Detection
-
-*(Add Screenshot Here)*
-
----
-
-## AI Chatbot
-
-*(Add Screenshot Here)*
-
----
-
-## Weather
-
-*(Add Screenshot Here)*
-
----
-
-# 🎥 Demo
-
-Demo Video
-
-> Add your YouTube or Drive link here.
+The application will open in your browser.
 
 ---
 
 # 🌍 Supported Languages
 
-- 🇬🇧 English
-- 🇵🇰 Urdu
-- 🌾 Sindhi
+ZameenAI is designed to support:
+
+🇬🇧 **English**
+
+🇵🇰 **Urdu**
+
+🌾 **Sindhi**
+
+The system is especially designed to make agricultural information easier to understand for Pakistani farmers.
 
 ---
 
-# 💡 Future Improvements
+# 📸 Screenshots
 
-- Satellite Crop Monitoring
-- AI Pest Prediction
-- Soil Analysis
-- Offline Mode
-- Mobile Application
-- Government Scheme Recommendations
-- Farmer Community
-- Voice Responses
-- Market Price Forecasting
+## 🏠 Main Dashboard
+
+> Add your dashboard screenshot here.
+
+```text
+📷 Screenshot
+```
+
+---
+
+## 🦠 Disease Detection
+
+> Add disease detection screenshot here.
+
+```text
+📷 Screenshot
+```
+
+---
+
+## 💬 AI Farming Chatbot
+
+> Add chatbot screenshot here.
+
+```text
+📷 Screenshot
+```
+
+---
+
+## 🌦️ Weather Dashboard
+
+> Add weather screenshot here.
+
+```text
+📷 Screenshot
+```
+
+---
+
+## 🤖 Smart Advisory
+
+> Add Smart Advisory screenshot here.
+
+```text
+📷 Screenshot
+```
+
+---
+
+# 🎥 Demo
+
+### 🚀 Project Demo
+
+> Add your YouTube / Google Drive / Loom demo link here.
+
+---
+
+# 🎯 Target Users
+
+ZameenAI is designed for:
+
+* 👨‍🌾 Farmers
+* 🌱 Small-scale growers
+* 🚜 Agricultural workers
+* 🎓 Agriculture students
+* 🧑‍🔬 Agricultural advisors
+* 🇵🇰 Farming communities in Pakistan
+
+---
+
+# 💡 Why ZameenAI?
+
+Traditional farming often requires farmers to search through different sources for different problems.
+
+ZameenAI brings several tools together:
+
+```text
+🌦️ Weather
+      +
+🦠 Disease Detection
+      +
+🤖 AI Advisory
+      +
+💬 Farming Chatbot
+      +
+🎙️ Voice Assistant
+      +
+📈 Profit Estimation
+      +
+📅 Crop Calendar
+      ↓
+🌾 ZameenAI
+```
+
+One platform.
+Multiple farming tools.
+Designed for Pakistan.
+
+---
+
+# 🚀 Future Roadmap
+
+### 🔮 Coming Next
+
+* 📚 RAG-based agricultural knowledge base
+* 🔗 LangChain AI workflows
+* 🛰️ Satellite crop monitoring
+* 🌱 Soil analysis
+* 📡 IoT soil-moisture monitoring
+* 🐛 AI pest prediction
+* 📈 Real-time market prices
+* 📍 Location-based farming recommendations
+* 📱 Mobile application
+* 🔊 Advanced voice interaction
+* 🗄️ Farmer history & profiles
+* 🌾 More crop disease classes
+* 📊 Advanced yield prediction
+* 🏛️ Government agriculture information
+
+---
+
+# ⚠️ Limitations
+
+ZameenAI is currently a prototype and has some limitations:
+
+* Disease detection may not always be accurate.
+* Market prices are currently predefined.
+* Crop calendar information is predefined.
+* AI features require internet access.
+* Weather depends on the external OpenWeather API.
+* AI recommendations should be verified for critical agricultural decisions.
+
+---
+
+# 🌾 Project Vision
+
+> **"Empowering farmers with intelligent technology and accessible agricultural knowledge."**
+
+ZameenAI aims to bridge the gap between **modern AI technology and everyday farming**.
+
+Our vision is to build a future where every farmer can access useful agricultural assistance simply through a phone, image, or voice.
 
 ---
 
 # 👨‍💻 Team
 
-- Anha Alishba
-- Sayed Asad Murtiza
+### 🌾 ZameenAI Team
+
+* **Anha Alishba**
+* **Sayed Asad Murtiza**
 
 ---
 
-# ❤️ Acknowledgements
+# 🙏 Acknowledgements
 
-- Google Gemini
-- Groq
-- OpenWeather
-- Streamlit
+Special thanks to:
+
+* 🤖 Google Gemini
+* ⚡ Groq
+* 🌦️ OpenWeather
+* 🎨 Streamlit
+* 🎙️ Whisper
+* 🐍 Python
+* 🌾 Agricultural knowledge & farming communities
 
 ---
 
 # 📜 License
 
-This project is licensed under the MIT License.
+This project is licensed under the **MIT License**.
 
 ---
 
-## ⭐ If you like this project, don't forget to star the repository!
+<div align="center">
+
+## 🌾 ZameenAI
+
+### **Smart Technology. Smarter Farming. 🇵🇰**
+
+⭐ **If you find this project useful, consider giving it a star!**
+
+</div>
+```
