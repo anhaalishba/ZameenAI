@@ -208,43 +208,6 @@ ZameenAI combines multiple AI technologies:
 
 ---
 
-# 🔗 LangChain & RAG
-
-> **Current version:** ZameenAI does **not currently use LangChain or RAG**.
-
-The current system directly communicates with the required AI APIs.
-
-### 🚀 Planned RAG Architecture
-
-A future version can introduce **Retrieval-Augmented Generation (RAG)** using verified agricultural knowledge.
-
-```text
-                 👨‍🌾 Farmer Question
-                         ↓
-                 🔎 RAG Retriever
-                         ↓
-              📚 Agricultural Knowledge
-                         ↓
-                 📄 Relevant Documents
-                         ↓
-                    🤖 LLM
-                         ↓
-              🌾 Farmer-Friendly Answer
-```
-
-Potential knowledge sources could include:
-
-* 🇵🇰 Pakistan agricultural guidelines
-* 🌾 Crop management documents
-* 🦠 Disease manuals
-* 🧪 Fertilizer recommendations
-* 🏛️ Government agriculture resources
-* 📚 Verified agricultural research
-
-**LangChain** could later be used to manage the retrieval pipeline, tools and multi-step AI workflows.
-
----
-
 # 🏗️ System Architecture
 
 ```text
@@ -288,10 +251,7 @@ ZameenAI/
 ├── README.md
 │
 ├── .streamlit/
-│   └── secrets.toml
-│
-└── assets/
-    └── images/
+   └── secrets.toml
 ```
 
 ---
@@ -301,7 +261,7 @@ ZameenAI/
 ## 1️⃣ Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/ZameenAI.git
+git clone https://github.com/anhaalishba/ZameenAI.git
 cd ZameenAI
 ```
 
@@ -380,78 +340,6 @@ ZameenAI is designed to support:
 
 The system is especially designed to make agricultural information easier to understand for Pakistani farmers.
 
----
-
-# 📸 Screenshots
-
-## 🏠 Main Dashboard
-
-> Add your dashboard screenshot here.
-
-```text
-📷 Screenshot
-```
-
----
-
-## 🦠 Disease Detection
-
-> Add disease detection screenshot here.
-
-```text
-📷 Screenshot
-```
-
----
-
-## 💬 AI Farming Chatbot
-
-> Add chatbot screenshot here.
-
-```text
-📷 Screenshot
-```
-
----
-
-## 🌦️ Weather Dashboard
-
-> Add weather screenshot here.
-
-```text
-📷 Screenshot
-```
-
----
-
-## 🤖 Smart Advisory
-
-> Add Smart Advisory screenshot here.
-
-```text
-📷 Screenshot
-```
-
----
-
-# 🎥 Demo
-
-### 🚀 Project Demo
-
-> Add your YouTube / Google Drive / Loom demo link here.
-
----
-
-# 🎯 Target Users
-
-ZameenAI is designed for:
-
-* 👨‍🌾 Farmers
-* 🌱 Small-scale growers
-* 🚜 Agricultural workers
-* 🎓 Agriculture students
-* 🧑‍🔬 Agricultural advisors
-* 🇵🇰 Farming communities in Pakistan
 
 ---
 
