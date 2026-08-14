@@ -1,4 +1,3 @@
-````markdown
 # 🌾 ZameenAI
 
 > **AI-Powered Smart Farming Decision System for Pakistan 🇵🇰**
