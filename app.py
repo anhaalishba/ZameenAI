@@ -1,6 +1,7 @@
 import streamlit as st
 import requests
 import os
+import re
 import base64
 import json
 import datetime
@@ -439,6 +440,36 @@ def forecast_card(col, day_label, icon_url, temp, desc):
     </div>
     """, unsafe_allow_html=True)
 
+def clean_for_speech(text):
+    # Code fences and inline code (keeps the inner text)
+    text = re.sub(r"```[\w+-]*\n?", "", text)
+    text = re.sub(r"`([^`]*)`", r"\1", text)
+
+    # Images and links -> keep only the label
+    text = re.sub(r"!\[([^\]]*)\]\([^)]*\)", r"\1", text)
+    text = re.sub(r"\[([^\]]+)\]\([^)]*\)", r"\1", text)
+    text = re.sub(r"https?://\S+", "", text)  # raw URLs
+
+    # Block-level markdown (at the start of a line)
+    text = re.sub(r"^\s*([-*_]\s*){3,}$", "", text, flags=re.M)   # --- *** ___
+    text = re.sub(r"^\s*#{1,6}\s*", "", text, flags=re.M)         # headings
+    text = re.sub(r"^\s*>+\s?", "", text, flags=re.M)             # blockquotes
+    text = re.sub(r"^\s*([-*+]|\d+[.)])\s+", "", text, flags=re.M)  # bullets / numbered lists
+
+    # Tables
+    text = re.sub(r"^\s*\|[\s:|-]+\|\s*$", "", text, flags=re.M)  # separator row
+    text = re.sub(r"\s*\|\s*", ", ", text)                        # remaining pipes -> commas
+
+    # Inline formatting
+    text = re.sub(r"(\*\*|__)(.+?)\1", r"\2", text)               # bold
+    text = re.sub(r"(?<![\w*])([*_])(?!\s)(.+?)(?<!\s)\1(?![\w*])", r"\2", text)  # italic
+    text = re.sub(r"~~(.+?)~~", r"\1", text)                      # strikethrough
+
+    # HTML tags and extra whitespace
+    text = re.sub(r"<[^>]+>", "", text)
+    text = re.sub(r"[ \t]+", " ", text)
+    text = re.sub(r"\n{3,}", "\n\n", text)
+    return text.strip()
 
 def read_aloud_button(text, key):
     """Renders a small speaker button that reads the given text aloud
@@ -447,7 +478,8 @@ def read_aloud_button(text, key):
     # Put the text inside a <script> block as a JS variable instead of an
     # inline HTML attribute -- avoids quote-escaping conflicts (json.dumps
     # produces double-quoted strings, which broke onclick="...").
-    safe_text = json.dumps(text).replace("</script>", "<\\/script>")
+    cleaned_text = clean_for_speech(text)
+    safe_text = json.dumps(cleaned_text).replace("</script>", "<\\/script>")
     html_code = f"""
     <div style="margin-top:4px; margin-bottom:2px;">
         <button id="btn-{key}"
